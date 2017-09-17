@@ -6,11 +6,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>MP1</title>
     <script id="shader-vs" type="x-shader/x-vertex">
-        attribute vec3 aVertexPosition; attribute vec4 aVertexColor; uniform mat4 uMVMatrix; varying vec4 vColor; void main(void)
-        { gl_Position = uMVMatrix*vec4(aVertexPosition, 1.0); vColor = aVertexColor; }
+        attribute vec3 aVertexPosition; 
+        attribute vec4 aVertexColor; 
+        uniform mat4 uMVMatrix; 
+        varying vec4 vColor; 
+        void main(void)
+        { 
+            gl_Position = uMVMatrix*vec4(aVertexPosition, 1.0); 
+            vColor = aVertexColor; 
+        }
     </script>
     <script id="shader-fs" type="x-shader/x-fragment">
-        precision mediump float; varying vec4 vColor; void main(void) { gl_FragColor = vColor; }
+        precision mediump float; 
+        varying vec4 vColor; 
+        void main(void) { gl_FragColor = vColor; }
     </script>
     <script src="mp1_files/gl-matrix-min.js"></script>
     <script type="text/javascript" src="mp1_files/webgl-utils.js"></script>
