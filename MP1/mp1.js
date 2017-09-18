@@ -1,11 +1,13 @@
 var gl;
 var canvas;
 var shaderProgram;
+
+// Create places to store vertex positions
 var blueVertexPositionBuffer;
 var orangeVertexPositionBuffer;
 
 
-// Create a place to store vertex colors
+// Create places to store vertex colors
 var blueColorBuffer;
 var orangeColorBuffer;
 
@@ -30,7 +32,6 @@ function setMatrixUniforms() {
 function degToRad(degrees) {
   return degrees * Math.PI / 180;
 }
-
 
 /**
  * Creates a context for WebGL
@@ -129,7 +130,8 @@ function setupShaders() {
 /**
  * Populate buffers with data
  */
-var blueVertices = [
+// Data of vertex positions
+ var blueVertices = [
   -0.90,0.95,0.00,-0.90,0.64,0.00,0.88,0.95,0.00,-0.90,0.64,0.00,0.88,0.95,0.00,0.88,0.64,0.00,-0.72,0.64,0.00,-0.72,-0.31,0.00,-0.34,0.64,0.00,-0.72,-0.31,0.00,-0.34,0.64,0.00,-0.34,-0.31,0.00,0.32,0.64,0.00,0.32,-0.31,0.00,0.71,0.64,0.00,0.32,
   -0.31,0.00,0.71,0.64,0.00,0.71,-0.31,0.00,-0.34,0.38,0.00,-0.34,-0.06,0.00,-0.19,0.38,0.00,-0.34,-0.06,0.00,-0.19,0.38,0.00,-0.19,-0.06,0.00,0.17,0.38,0.00,0.17,-0.06,0.00,0.32,0.38,0.00,0.17,-0.06,0.00,0.32,0.38,0.00,0.32,-0.06,0.00
 ];
@@ -139,6 +141,7 @@ var orangeVertices = [
   0.58,-0.58,0.00,0.71,-0.38,0.00,0.58,-0.58,0.00,0.71,-0.38,0.00,0.71,-0.50,0.00  
 ];
 function setupBuffers() {
+  // Fill position buffers with their position data respectively
   blueVertexPositionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, blueVertexPositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(blueVertices), gl.STATIC_DRAW);
@@ -151,16 +154,19 @@ function setupBuffers() {
   orangeVertexPositionBuffer.itemSize = 3;
   orangeVertexPositionBuffer.numberOfItems = 36;
 
+  // Color data
   var blue = [0.07, 0.16, 0.29, 1.0];
   var orange = [0.91, 0.29, 0.22, 1.0];
   var blueColors = [];
   var orangeColors = [];
-  for(var i = 0; i < 30; i++) {
-      blueColors = blueColors.concat(blue);
-  }
   for(var i = 0; i < 36; i++) {
+    if(i < 30) {
+      blueColors = blueColors.concat(blue);
+    }
     orangeColors = orangeColors.concat(orange);
   }
+
+  // Fill the color buffers with their color data respectively
   blueColorBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(blueColors), gl.STATIC_DRAW);
@@ -172,7 +178,6 @@ function setupBuffers() {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(orangeColors), gl.STATIC_DRAW);
   orangeColorBuffer.itemSize = 4;
   orangeColorBuffer.numItems = 36;
-
 }
 
 /**
@@ -183,6 +188,8 @@ function draw() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   mat4.identity(mvMatrix);
   mat4.rotateY(mvMatrix, mvMatrix, degToRad(rotAngle));
+
+  // Draw blue part of the badge
   gl.bindBuffer(gl.ARRAY_BUFFER, blueVertexPositionBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
     blueVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -193,6 +200,7 @@ function draw() {
   setMatrixUniforms();
   gl.drawArrays(gl.TRIANGLES, 0, blueVertexPositionBuffer.numberOfItems);
 
+  // Draw orange bands of the badge
   gl.bindBuffer(gl.ARRAY_BUFFER, orangeVertexPositionBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
     orangeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -214,6 +222,8 @@ function animate() {
     var elapsed = timeNow - lastTime;
     rotAngle = (rotAngle + 1.0) % 360;
   }
+
+  // Animation that does not use a uniform affine transformation
   lastTime = timeNow;
   sinscalar += 0.1;
   gl.bindBuffer(gl.ARRAY_BUFFER, orangeVertexPositionBuffer);
