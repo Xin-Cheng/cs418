@@ -1,11 +1,13 @@
 var gl;
 var canvas;
 var shaderProgram;
-var vertexPositionBuffer;
+var blueVertexPositionBuffer;
+var orangeVertexPositionBuffer;
 
 
 // Create a place to store vertex colors
-var vertexColorBuffer;
+var blueColorBuffer;
+var orangeColorBuffer;
 
 var mvMatrix = mat4.create();
 var rotAngle = 0;
@@ -127,103 +129,51 @@ function setupShaders() {
 /**
  * Populate buffers with data
  */
-var triangleVertices = [
-  -0.90,0.95,0.00,
-  -0.90,0.64,0.00,
-  0.88,0.95,0.00,
-  -0.90,0.64,0.00,
-  0.88,0.95,0.00,
-  0.88,0.64,0.00,
-  -0.72,0.64,0.00,
-  -0.72,-0.31,0.00,
-  -0.34,0.64,0.00,
-  -0.72,-0.31,0.00,
-  -0.34,0.64,0.00,
-  -0.34,-0.31,0.00,
-  0.32,0.64,0.00,
-  0.32,-0.31,0.00,
-  0.71,0.64,0.00,
-  0.32,-0.31,0.00,
-  0.71,0.64,0.00,
-  0.71,-0.31,0.00,
-  -0.34,0.38,0.00,
-  -0.34,-0.06,0.00,
-  -0.19,0.38,0.00,
-  -0.34,-0.06,0.00,
-  -0.19,0.38,0.00,
-  -0.19,-0.06,0.00,
-  0.17,0.38,0.00,
-  0.17,-0.06,0.00,
-  0.32,0.38,0.00,
-  0.17,-0.06,0.00,
-  0.32,0.38,0.00,
-  0.32,-0.06,0.00,
-  -0.72,-0.38,0.00,
-  -0.72,-0.50,0.00,
-  -0.60,-0.38,0.00,
-  -0.72,-0.50,0.00,
-  -0.60,-0.38,0.00,
-  -0.60,-0.58,0.00,
-  -0.46,-0.38,0.00,
-  -0.46,-0.66,0.00,
-  -0.34,-0.38,0.00,
-  -0.46,-0.66,0.00,
-  -0.34,-0.38,0.00,
-  -0.34,-0.74,0.00,
-  -0.20,-0.38,0.00,
-  -0.20,-0.83,0.00,
-  -0.08,-0.38,0.00,
-  -0.20,-0.83,0.00,
-  -0.08,-0.38,0.00,
-  -0.08,-0.91,0.00,
-  0.06,-0.38,0.00,
-  0.06,-0.91,0.00,
-  0.18,-0.38,0.00,
-  0.06,-0.91,0.00,
-  0.18,-0.38,0.00,
-  0.18,-0.83,0.00,
-  0.32,-0.38,0.00,
-  0.32,-0.74,0.00,
-  0.45,-0.38,0.00,
-  0.32,-0.74,0.00,
-  0.45,-0.38,0.00,
-  0.45,-0.66,0.00,
-  0.58,-0.38,0.00,
-  0.58,-0.58,0.00,
-  0.71,-0.38,0.00,
-  0.58,-0.58,0.00,
-  0.71,-0.38,0.00,
-  0.71,-0.50,0.00  
+var blueVertices = [
+  -0.90,0.95,0.00,-0.90,0.64,0.00,0.88,0.95,0.00,-0.90,0.64,0.00,0.88,0.95,0.00,0.88,0.64,0.00,-0.72,0.64,0.00,-0.72,-0.31,0.00,-0.34,0.64,0.00,-0.72,-0.31,0.00,-0.34,0.64,0.00,-0.34,-0.31,0.00,0.32,0.64,0.00,0.32,-0.31,0.00,0.71,0.64,0.00,0.32,
+  -0.31,0.00,0.71,0.64,0.00,0.71,-0.31,0.00,-0.34,0.38,0.00,-0.34,-0.06,0.00,-0.19,0.38,0.00,-0.34,-0.06,0.00,-0.19,0.38,0.00,-0.19,-0.06,0.00,0.17,0.38,0.00,0.17,-0.06,0.00,0.32,0.38,0.00,0.17,-0.06,0.00,0.32,0.38,0.00,0.32,-0.06,0.00
 ];
+var orangeVertices = [
+  -0.72,-0.38,0.00,-0.72,-0.50,0.00,-0.60,-0.38,0.00,-0.72,-0.50,0.00,-0.60,-0.38,0.00,-0.60,-0.58,0.00,-0.46,-0.38,0.00,-0.46,-0.66,0.00,-0.34,-0.38,0.00,-0.46,-0.66,0.00,-0.34,-0.38,0.00,-0.34,-0.74,0.00,-0.20,-0.38,0.00,-0.20,-0.83,0.00,-0.08,-0.38,0.00,
+  -0.20,-0.83,0.00,-0.08,-0.38,0.00,-0.08,-0.91,0.00,0.06,-0.38,0.00,0.06,-0.91,0.00,0.18,-0.38,0.00,0.06,-0.91,0.00,0.18,-0.38,0.00,0.18,-0.83,0.00,0.32,-0.38,0.00,0.32,-0.74,0.00,0.45,-0.38,0.00,0.32,-0.74,0.00,0.45,-0.38,0.00,0.45,-0.66,0.00,0.58,-0.38,0.00,
+  0.58,-0.58,0.00,0.71,-0.38,0.00,0.58,-0.58,0.00,0.71,-0.38,0.00,0.71,-0.50,0.00  
+];
+
 function setupBuffers() {
-  vertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-  var number = 6*11;
-  // Fill in the position data of badge
+  blueVertexPositionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, blueVertexPositionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(blueVertices), gl.STATIC_DRAW);
+  blueVertexPositionBuffer.itemSize = 3;
+  blueVertexPositionBuffer.numberOfItems = 30;
   
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW);
-  vertexPositionBuffer.itemSize = 3;
-  vertexPositionBuffer.numberOfItems = number;
+  orangeVertexPositionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, orangeVertexPositionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(orangeVertices), gl.STATIC_DRAW);
+  orangeVertexPositionBuffer.itemSize = 3;
+  orangeVertexPositionBuffer.numberOfItems = 36;
 
-  vertexColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-
-  // Build colors
   var blue = [0.07, 0.16, 0.29, 1.0];
   var orange = [0.91, 0.29, 0.22, 1.0];
-  var colors = [];
-  for(var i = 0; i < 66; i++) {
-    if (i < 30) {
-      colors = colors.concat(blue);
-    }
-    else {
-      colors = colors.concat(orange);
-    }
+  var blueColors = [];
+  var orangeColors = [];
+  for(var i = 0; i < 30; i++) {
+      blueColors = blueColors.concat(blue);
   }
+  for(var i = 0; i < 36; i++) {
+    orangeColors = orangeColors.concat(orange);
+  }
+  blueColorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(blueColors), gl.STATIC_DRAW);
+  blueColorBuffer.itemSize = 4;
+  blueColorBuffer.numItems = 30;
 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-  vertexColorBuffer.itemSize = 4;
-  vertexColorBuffer.numItems = number;
+  orangeColorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, orangeColorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(orangeColors), gl.STATIC_DRAW);
+  orangeColorBuffer.itemSize = 4;
+  orangeColorBuffer.numItems = 36;
+
 }
 
 /**
@@ -234,15 +184,25 @@ function draw() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   mat4.identity(mvMatrix);
   mat4.rotateY(mvMatrix, mvMatrix, degToRad(rotAngle));
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, blueVertexPositionBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
-    vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+    blueVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexColorAttribute,
-    vertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    blueColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
   setMatrixUniforms();
-  gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numberOfItems);
+  gl.drawArrays(gl.TRIANGLES, 0, blueVertexPositionBuffer.numberOfItems);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, orangeVertexPositionBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
+    orangeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, orangeColorBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexColorAttribute,
+    orangeColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+  setMatrixUniforms();
+  gl.drawArrays(gl.TRIANGLES, 0, orangeVertexPositionBuffer.numberOfItems);
 }
 
 /**
@@ -288,6 +248,6 @@ function startup() {
 function tick() {
   requestAnimFrame(tick);
   draw();
-  animate();
+  // animate();
 }
 
