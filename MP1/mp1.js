@@ -138,7 +138,6 @@ var orangeVertices = [
   -0.20,-0.83,0.00,-0.08,-0.38,0.00,-0.08,-0.91,0.00,0.06,-0.38,0.00,0.06,-0.91,0.00,0.18,-0.38,0.00,0.06,-0.91,0.00,0.18,-0.38,0.00,0.18,-0.83,0.00,0.32,-0.38,0.00,0.32,-0.74,0.00,0.45,-0.38,0.00,0.32,-0.74,0.00,0.45,-0.38,0.00,0.45,-0.66,0.00,0.58,-0.38,0.00,
   0.58,-0.58,0.00,0.71,-0.38,0.00,0.58,-0.58,0.00,0.71,-0.38,0.00,0.71,-0.50,0.00  
 ];
-
 function setupBuffers() {
   blueVertexPositionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, blueVertexPositionBuffer);
@@ -217,15 +216,13 @@ function animate() {
   }
   lastTime = timeNow;
   sinscalar += 0.1;
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, orangeVertexPositionBuffer);
   var newVertices = [];
-  for(var i = 0; i < 66 * 3; i+=3) {
-    var point = [triangleVertices[i] , triangleVertices[i+1] + Math.sin(sinscalar+triangleVertices[i])*0.5,  0.0];
+  for(var i = 0; i < 36 * 3; i+=3) {
+    var point = [orangeVertices[i] , orangeVertices[i+1] + Math.sin(sinscalar+orangeVertices[i])*0.05,  0.0];
     newVertices = newVertices.concat(point);
   }
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(newVertices), gl.STATIC_DRAW);
-  vertexPositionBuffer.itemSize = 3;
-  vertexPositionBuffer.numberOfItems = 66;
 }
 
 /**
@@ -248,6 +245,6 @@ function startup() {
 function tick() {
   requestAnimFrame(tick);
   draw();
-  // animate();
+  animate();
 }
 
