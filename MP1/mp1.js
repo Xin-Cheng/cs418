@@ -192,18 +192,6 @@ function draw() {
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   mat4.identity(mvMatrix);
-  mat4.rotateY(mvMatrix, mvMatrix, degToRad(rotAngle));
-
-  // Draw blue part of the badge
-  gl.bindBuffer(gl.ARRAY_BUFFER, blueVertexPositionBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
-    blueVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexColorAttribute,
-    blueColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-  setMatrixUniforms();
-  gl.drawArrays(gl.TRIANGLES, 0, blueVertexPositionBuffer.numberOfItems);
 
   // Draw orange bands of the badge
   gl.bindBuffer(gl.ARRAY_BUFFER, orangeVertexPositionBuffer);
@@ -215,6 +203,18 @@ function draw() {
 
   setMatrixUniforms();
   gl.drawArrays(gl.TRIANGLES, 0, orangeVertexPositionBuffer.numberOfItems);
+
+  // Draw blue part of the badge
+  mat4.rotateY(mvMatrix, mvMatrix, degToRad(rotAngle));
+  gl.bindBuffer(gl.ARRAY_BUFFER, blueVertexPositionBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
+    blueVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexColorAttribute,
+    blueColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+  setMatrixUniforms();
+  gl.drawArrays(gl.TRIANGLES, 0, blueVertexPositionBuffer.numberOfItems);
 }
 
 /**
