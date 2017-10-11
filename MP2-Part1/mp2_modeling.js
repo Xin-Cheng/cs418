@@ -21,6 +21,7 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
            vertexArray.push(minY+deltaY*i);
            vertexArray.push(0);
            
+           // Initialize normal array with zero
            normalArray.push(0);
            normalArray.push(0);
            normalArray.push(1);
@@ -40,6 +41,8 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
            faceArray.push(vid+n+1);
            numT+=2;
        }
+
+    computePerVertexNormal(vertexArray, faceArray, normalArray);
     return numT;
 }
 /**
@@ -64,4 +67,44 @@ function generateLinesFromIndexedTriangles(faceArray,lineArray)
     }
 }
 
+/**
+ * Compute per-vertex normals
+ * @param {Array} vertexArray array that contains vertices generated
+ * @param {Array} faceArray array of faces for triangles
+ * @param {Array} normalArray array of normals for triangles
+ */
+function computePerVertexNormal(vertexArray, faceArray, normalArray)
+{
+    for(var i = 0; i < faceArray.length-2; i+=3)
+    {
+        var firstV = vec3.fromValues(vertexArray[faceArray[i]*3],vertexArray[faceArray[i]*3+1],vertexArray[faceArray[i]*3+2]);
+        var secondV = vec3.fromValues(vertexArray[faceArray[i+1]*3],vertexArray[faceArray[i+1]*3+1],vertexArray[faceArray[i+1]*3+2]);
+        var thirdV = vec3.fromValues(vertexArray[faceArray[i+2]*3],vertexArray[faceArray[i+2]*3+1],vertexArray[faceArray[i+2]*3+2]);
 
+        // Calculate normal
+        var normal = vec3.create();
+        var v1 = vec3.create();
+        var v2 = vec3.create();
+        vec3.subtract(v1, secondV, firstV);
+        vec3.subtract(v2, thirdV, firstV);
+        vec3.cross(normal, v1, v2);
+
+        // Add normal to each vertex
+        for(var j=0; j<3; j++)
+        {
+            normalArray[faceArray[i+j]*3] += normal[0];
+            normalArray[faceArray[i+j]*3+1] += normal[1];
+            normalArray[faceArray[i+j]*3+2] += normal[2];
+        }
+    }
+
+    // Normalize the normal vector
+    for(var i=0; i<normalArray.length-2; i+=3)
+    {
+        var normal = vec3.create();
+        vec3.normalize(normal, vec3.fromValues(normalArray[i], normalArray[i+1], normalArray[i+2]));
+        normalArray[i] = normal[0];
+        normalArray[i+1] = normal[1];
+        normalArray[i+2] = normal[2];
+    }
+}

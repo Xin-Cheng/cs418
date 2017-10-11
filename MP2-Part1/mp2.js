@@ -44,9 +44,11 @@ function setupTerrainBuffers() {
     var fTerrain=[];
     var nTerrain=[];
     var eTerrain=[];
-    var gridN=50;
-    
-    var numT = terrainFromIteration(gridN, -2.5,2.5,-2,3.0, vTerrain, fTerrain, nTerrain);
+    // Grid size 2^n+1 by 2^n+1 
+    var gridN=33;
+
+    // Size of the terrain, terrain out of the screen will be clipped
+    var numT = terrainFromIteration(gridN, -3.0,3.0,-3.0,2.5, vTerrain, fTerrain, nTerrain);
     console.log("Generated ", numT, " triangles"); 
     tVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);      
