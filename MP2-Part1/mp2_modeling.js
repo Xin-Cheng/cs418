@@ -48,7 +48,7 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
     vertexArray[vertexArray.length - 1] = randomNumber();
     vertexArray[3*n-1] = randomNumber();
     vertexArray[vertexArray.length+2-3*n] = randomNumber();
-    diamondSquare(0, vertexArray.length-1, n + 1, n + 1, vertexArray);
+    diamondSquare(0, vertexArray.length-1, n + 1, n + 1, vertexArray, 1);
 
     // Compute pervertex normal   
     computePerVertexNormal(vertexArray, faceArray, normalArray);
@@ -62,8 +62,9 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
  * @param {number} bottomRight the index of bottom right coner
  * @param {number} size grid size
  * @param {Array} vertexArray array that contains vertices generated
+ * @param {number} scale sale for random number
  */
-function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray)
+function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray, scale)
 {
     if(size == 2)
     {
@@ -76,7 +77,7 @@ function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray)
     var brIndex = bottomRight;
     var mid = (2*topLeft + 2*bottomRight)/4 + 1;
     // Perform diamond step
-    vertexArray[mid] = (vertexArray[tlIndex]+vertexArray[brIndex]+vertexArray[trIndex]+vertexArray[blIndex])/4+randomNumber();
+    vertexArray[mid] = (vertexArray[tlIndex]+vertexArray[brIndex]+vertexArray[trIndex]+vertexArray[blIndex])/4+randomNumber()*scale;
     // Perform square step
     // Top
     var topIndex = (2*topLeft + size*3 + 1)/2;
@@ -86,7 +87,7 @@ function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray)
     {
         topTopValue = vertexArray[ttIndex];
     }
-    vertexArray[topIndex] = (topTopValue+vertexArray[trIndex]+vertexArray[mid]+vertexArray[tlIndex])/4+randomNumber();   
+    vertexArray[topIndex] = (topTopValue+vertexArray[trIndex]+vertexArray[mid]+vertexArray[tlIndex])/4+randomNumber()*scale;   
     // Right
     var rightIndex = (topLeft + size*3 - 1 + bottomRight)/2;
     var rightRightValue = 0;
@@ -95,7 +96,7 @@ function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray)
     {
         rightRightValue = vertexArray[rrIndex];
     }
-    vertexArray[rightIndex] = (vertexArray[trIndex]+rightRightValue+vertexArray[brIndex]+vertexArray[mid])/4+randomNumber();
+    vertexArray[rightIndex] = (vertexArray[trIndex]+rightRightValue+vertexArray[brIndex]+vertexArray[mid])/4+randomNumber()*scale;
     // Bottom
     var bottomIndex = (2*bottomRight-(3*size-1))/2 + 1;
     var bottomBottomValue = 0;
@@ -104,7 +105,7 @@ function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray)
     {
         bottomBottomValue = vertexArray[bbIndex];
     }
-    vertexArray[bottomIndex] = (vertexArray[mid]+vertexArray[brIndex]+bottomBottomValue+vertexArray[blIndex])/4+randomNumber();
+    vertexArray[bottomIndex] = (vertexArray[mid]+vertexArray[brIndex]+bottomBottomValue+vertexArray[blIndex])/4+randomNumber()*scale;
     // Left
     var leftIndex = (topLeft+bottomRight-(3*size-1))/2 + 2;
     var leftLeftValue = 0;
@@ -113,13 +114,14 @@ function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray)
     {
         leftLeftValue = vertexArray[llIndex];
     }
-    vertexArray[leftIndex] = (vertexArray[tlIndex]+vertexArray[mid]+vertexArray[blIndex]+leftLeftValue)/4+randomNumber();
+    vertexArray[leftIndex] = (vertexArray[tlIndex]+vertexArray[mid]+vertexArray[blIndex]+leftLeftValue)/4+randomNumber()*scale;
     
     // Apply diamond square algorithm recursively
-    diamondSquare(topLeft, mid, (size+1)/2, gridSize, vertexArray);
-    diamondSquare(topIndex - 2, rightIndex, (size+1)/2, gridSize, vertexArray);
-    diamondSquare(leftIndex - 2, bottomIndex, (size+1)/2, gridSize, vertexArray);
-    diamondSquare(mid - 2, bottomRight, (size+1)/2, gridSize, vertexArray);
+    var reducer = 1.6;
+    diamondSquare(topLeft, mid, (size+1)/2, gridSize, vertexArray, scale/reducer);
+    diamondSquare(topIndex - 2, rightIndex, (size+1)/2, gridSize, vertexArray, scale/reducer);
+    diamondSquare(leftIndex - 2, bottomIndex, (size+1)/2, gridSize, vertexArray, scale/reducer);
+    diamondSquare(mid - 2, bottomRight, (size+1)/2, gridSize, vertexArray, scale/reducer);
 }
 
 
@@ -193,7 +195,7 @@ function computePerVertexNormal(vertexArray, faceArray, normalArray)
  */
 function randomNumber()
 {
-    return Math.floor(Math.random() * 1000)/2000;
+    return Math.floor(Math.random() * 1000)/1500;
 }
 /**
  * Check if two point are in the same row

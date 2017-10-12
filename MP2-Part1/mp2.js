@@ -45,10 +45,10 @@ function setupTerrainBuffers() {
     var nTerrain=[];
     var eTerrain=[];
     // Grid size 2^n by 2^n
-    var gridN=16;
+    var gridN=64;
 
     // Size of the terrain, terrain out of the screen will be clipped
-    var numT = terrainFromIteration(gridN, -0.8,0.8,-1.0,1.0, vTerrain, fTerrain, nTerrain);
+    var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain);
     console.log("Generated ", numT, " triangles"); 
     tVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);      
@@ -345,7 +345,7 @@ function draw() {
     mvPushMatrix();
     vec3.set(transformVec,0.0,-0.25,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-50));
+    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-60));
     // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(25));     
     setMatrixUniforms();
     
