@@ -44,11 +44,11 @@ function setupTerrainBuffers() {
     var fTerrain=[];
     var nTerrain=[];
     var eTerrain=[];
-    // Grid size 2^n+1 by 2^n+1 
-    var gridN=33;
+    // Grid size 2^n by 2^n
+    var gridN=16;
 
     // Size of the terrain, terrain out of the screen will be clipped
-    var numT = terrainFromIteration(gridN, -3.0,3.0,-3.0,2.5, vTerrain, fTerrain, nTerrain);
+    var numT = terrainFromIteration(gridN, -0.8,0.8,-1.0,1.0, vTerrain, fTerrain, nTerrain);
     console.log("Generated ", numT, " triangles"); 
     tVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);      
@@ -334,7 +334,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(75), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
@@ -345,7 +345,7 @@ function draw() {
     mvPushMatrix();
     vec3.set(transformVec,0.0,-0.25,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-60));
+    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-50));
     // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(25));     
     setMatrixUniforms();
     

@@ -24,7 +24,7 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
            // Initialize normal array with zero
            normalArray.push(0);
            normalArray.push(0);
-           normalArray.push(1);
+           normalArray.push(0);
        }
 
     var numT=0;
@@ -42,9 +42,87 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
            numT+=2;
        }
 
+    // Perform diamond square algorithm to set z values of each vertex
+    // Initialize coner value to random value
+    vertexArray[2] = randomNumber();
+    vertexArray[vertexArray.length - 1] = randomNumber();
+    vertexArray[3*n-1] = randomNumber();
+    vertexArray[vertexArray.length+2-3*n] = randomNumber();
+    diamondSquare(0, vertexArray.length-1, n + 1, n + 1, vertexArray);
+
+    // Compute pervertex normal   
     computePerVertexNormal(vertexArray, faceArray, normalArray);
+
     return numT;
 }
+
+/**
+ * Compute the height value of each vertex using diamond square algorithm
+ * @param {number} topLeft the index of top left coner
+ * @param {number} bottomRight the index of bottom right coner
+ * @param {number} size grid size
+ * @param {Array} vertexArray array that contains vertices generated
+ */
+function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray)
+{
+    if(size == 2)
+    {
+        return;
+    }
+    
+    var tlIndex = topLeft + 2;
+    var trIndex = topLeft + 3*size -1;
+    var blIndex = bottomRight-(3*size-1)+2;
+    var brIndex = bottomRight;
+    var mid = (2*topLeft + 2*bottomRight)/4 + 1;
+    // Perform diamond step
+    vertexArray[mid] = (vertexArray[tlIndex]+vertexArray[brIndex]+vertexArray[trIndex]+vertexArray[blIndex])/4+randomNumber();
+    // Perform square step
+    // Top
+    var topIndex = (2*topLeft + size*3 + 1)/2;
+    var topTopValue = 0;
+    var ttIndex = 2*topIndex - mid;
+    if(ttIndex >= 0 && ttIndex < vertexArray.length && isInSameColumn(ttIndex, topIndex, gridSize))
+    {
+        topTopValue = vertexArray[ttIndex];
+    }
+    vertexArray[topIndex] = (topTopValue+vertexArray[trIndex]+vertexArray[mid]+vertexArray[tlIndex])/4+randomNumber();   
+    // Right
+    var rightIndex = (topLeft + size*3 - 1 + bottomRight)/2;
+    var rightRightValue = 0;
+    var rrIndex = 2*mid - rightIndex;
+    if(rrIndex >= 0 && rrIndex < vertexArray.length && isInSameRow(rrIndex, rightIndex, gridSize))
+    {
+        rightRightValue = vertexArray[rrIndex];
+    }
+    vertexArray[rightIndex] = (vertexArray[trIndex]+rightRightValue+vertexArray[brIndex]+vertexArray[mid])/4+randomNumber();
+    // Bottom
+    var bottomIndex = (2*bottomRight-(3*size-1))/2 + 1;
+    var bottomBottomValue = 0;
+    var bbIndex = 2*mid - bottomIndex;
+    if(bbIndex >= 0 && bbIndex < vertexArray.length && isInSameColumn(bbIndex, bottomIndex, gridSize))
+    {
+        bottomBottomValue = vertexArray[bbIndex];
+    }
+    vertexArray[bottomIndex] = (vertexArray[mid]+vertexArray[brIndex]+bottomBottomValue+vertexArray[blIndex])/4+randomNumber();
+    // Left
+    var leftIndex = (topLeft+bottomRight-(3*size-1))/2 + 2;
+    var leftLeftValue = 0;
+    var llIndex = 2*mid - leftIndex;
+    if(llIndex >=0 && llIndex < vertexArray.length && isInSameRow(llIndex, leftIndex, gridSize))
+    {
+        leftLeftValue = vertexArray[llIndex];
+    }
+    vertexArray[leftIndex] = (vertexArray[tlIndex]+vertexArray[mid]+vertexArray[blIndex]+leftLeftValue)/4+randomNumber();
+    
+    // Apply diamond square algorithm recursively
+    diamondSquare(topLeft, mid, (size+1)/2, gridSize, vertexArray);
+    diamondSquare(topIndex - 2, rightIndex, (size+1)/2, gridSize, vertexArray);
+    diamondSquare(leftIndex - 2, bottomIndex, (size+1)/2, gridSize, vertexArray);
+    diamondSquare(mid - 2, bottomRight, (size+1)/2, gridSize, vertexArray);
+}
+
+
 /**
  * Generates line values from faces in faceArray
  * @param {Array} faceArray array of faces for triangles
@@ -107,4 +185,35 @@ function computePerVertexNormal(vertexArray, faceArray, normalArray)
         normalArray[i+1] = normal[1];
         normalArray[i+2] = normal[2];
     }
+}
+
+/**
+ * Generate a random number
+ * @return {number}
+ */
+function randomNumber()
+{
+    return Math.floor(Math.random() * 1000)/2000;
+}
+/**
+ * Check if two point are in the same row
+ * @param {number} first the index of first vertex
+ * @param {number} second the index of second vertex
+ * @param {number} gridSize grid size
+ * @return {Boolean}
+ */
+function isInSameRow(first, second, gridSize)
+{
+    return Boolean(Math.floor(first/(gridSize*3)) == Math.floor(first/(gridSize*3)));
+}
+/**
+ * Check if two point are in the same column
+ * @param {number} first the index of first vertex
+ * @param {number} second the index of second vertex
+ * @param {number} gridSize grid size
+ * @return {Boolean}
+ */
+function isInSameColumn(first, second, gridSize)
+{
+    return Boolean(first%(gridSize*3) == second%(gridSize*3));
 }
