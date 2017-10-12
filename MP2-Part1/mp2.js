@@ -351,17 +351,17 @@ function draw() {
     
     if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
     {
-      uploadLightsToShader([1,1,1],[1.0,0.0,0.0],[1.0,0.5,0.0],[1.0,0.0,0.0]);
+      uploadLightsToShader([20,20,20],[1.0,0.0,0.0],[1.0,0.5,0.0],[1.0,0.0,0.0]);
       drawTerrain();
     }
     
     if(document.getElementById("wirepoly").checked){
-      uploadLightsToShader([1,1,1],[1.0,0.0,0.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
+      uploadLightsToShader([20,20,20],[1.0,0.0,0.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
       drawTerrainEdges();
     }
 
     if(document.getElementById("wireframe").checked){
-      uploadLightsToShader([1,1,1],[1.0,1.0,1.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
+      uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
       drawTerrainEdges();
     }
     mvPopMatrix();
@@ -372,8 +372,9 @@ function draw() {
 /**
  * Animation to be called from tick. Updates globals and performs animation for each tick.
  */
+var days = 1;
 function animate() {
-   
+  days=days+5;
 }
 
 //----------------------------------------------------------------------------------
@@ -387,5 +388,15 @@ function animate() {
   setupBuffers();
   gl.clearColor(0.53, 0.81, 0.98, 1.0);
   gl.enable(gl.DEPTH_TEST);
+  tick();
+}
+
+//----------------------------------------------------------------------------------
+/**
+ * Tick called for every animation frame.
+ */
+function tick() {
+  requestAnimFrame(tick);
   draw();
+  animate();
 }

@@ -40,7 +40,7 @@
             uniform vec3 uDiffuseLightColor;
             uniform vec3 uSpecularLightColor;
 
-            uniform float uShininess;
+            const float shininess = 50.0;
             
             
             void main(void) {
@@ -65,7 +65,7 @@
                 
                 float rdotv = max(dot(reflectionVector, viewVectorEye), 0.0);
                 
-                float specularLightWeightning = pow(rdotv, uShininess);
+                float specularLightWeightning = pow(rdotv, shininess);
             
                 // Sum up all three reflection components and send to the fragment shader
                 vColor = vec4((uAmbientLightColor
