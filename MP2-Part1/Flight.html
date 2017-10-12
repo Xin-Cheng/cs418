@@ -39,6 +39,9 @@
             uniform vec3 uAmbientLightColor;
             uniform vec3 uDiffuseLightColor;
             uniform vec3 uSpecularLightColor;
+            uniform vec3 uAmbientMaterialColor;
+            uniform vec3 uDiffuseMaterialColor;
+            uniform vec3 uSpecularMaterialColor;
 
             const float shininess = 50.0;
             
@@ -68,9 +71,9 @@
                 float specularLightWeightning = pow(rdotv, shininess);
             
                 // Sum up all three reflection components and send to the fragment shader
-                vColor = vec4((uAmbientLightColor
-                    + uDiffuseLightColor * diffuseLightWeightning
-                    + uSpecularLightColor * specularLightWeightning),1.0);
+                vColor = vec4(((uAmbientLightColor*uAmbientMaterialColor)
+                    + (uDiffuseLightColor*uDiffuseMaterialColor) * diffuseLightWeightning
+                    + (uSpecularLightColor*uSpecularMaterialColor) * specularLightWeightning),1.0);
             
                 gl_FragColor = vColor;
              }
@@ -85,12 +88,4 @@
   
 <body onload="startup();">
  <canvas id="myGLCanvas" width="800" height="800"></canvas>
-    <form id="input_form">
-        <fieldset>
-            <legend>Rendering Parameters</legend>
-         <input type="radio" name="primitive" id="wireframe" value="wireframe"> Wireframe
-         <input type="radio" name="primitive" id="polygon" value="polygon"> Polygon
-         <input type="radio" name="primitive" id="wirepoly" value="wirepoly" checked=""> Polygon with Edges  
-        </fieldset>
-        </form>
 </body></html>

@@ -8,9 +8,10 @@
  * @param {Array} vertexArray Array that will contain vertices generated
  * @param {Array} faceArray Array that will contain faces generated
  * @param {Array} normalArray Array that will contain normals generated
+ * * @param {Array} colorArray Array that will contain vertex color
  * @return {number}
  */
-function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,normalArray)
+function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,normalArray, colorArray)
 {
     var deltaX=(maxX-minX)/n;
     var deltaY=(maxY-minY)/n;
@@ -49,13 +50,37 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
     vertexArray[3*n-1] = randomNumber();
     vertexArray[vertexArray.length+2-3*n] = randomNumber();
     diamondSquare(0, vertexArray.length-1, n + 1, n + 1, vertexArray, 1);
-
+    calculateColor(vertexArray, colorArray);
     // Compute pervertex normal   
     computePerVertexNormal(vertexArray, faceArray, normalArray);
 
     return numT;
 }
 
+/**
+ * Compute vertex color according to the height value
+ * @param {Array} vertexArray array that contains vertices generated
+ * @param {Array} colorArray array of color of each vertex
+ */
+function calculateColor(vertexArray, colorArray)
+{
+    for(var i = 0; i < vertexArray.length-2; i+=3)
+    {
+        if(vertexArray[i+2]<0.1)
+        {
+            colorArray.push(0.0);
+            colorArray.push(1.0);
+            colorArray.push(0.0);
+            colorArray.push(1.0);
+        }
+        else{
+            colorArray.push(1.0);
+            colorArray.push(1.0);
+            colorArray.push(1.0);
+            colorArray.push(1.0);
+        }
+    }
+}
 /**
  * Compute the height value of each vertex using diamond square algorithm
  * @param {number} topLeft the index of top left coner

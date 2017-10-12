@@ -16,6 +16,9 @@ var tIndexTriBuffer;
 //Create a place to store the traingle edges
 var tIndexEdgeBuffer;
 
+//Create a place to store the color of each vertex
+var colorBuffer;
+
 // View parameters
 var eyePt = vec3.fromValues(0.0,0.0,0.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
@@ -44,11 +47,12 @@ function setupTerrainBuffers() {
     var fTerrain=[];
     var nTerrain=[];
     var eTerrain=[];
+    var color=[];
     // Grid size 2^n by 2^n: 256
     var gridN=32;
 
     // Size of the terrain, terrain out of the screen will be clipped
-    var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain);
+    var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain, color);
     console.log("Generated ", numT, " triangles"); 
     tVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);      
@@ -56,6 +60,13 @@ function setupTerrainBuffers() {
     tVertexPositionBuffer.itemSize = 3;
     tVertexPositionBuffer.numItems = (gridN+1)*(gridN+1);
     
+    // Fill the color buffers with color according to the height value
+    colorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color), gl.STATIC_DRAW);
+    colorBuffer.itemSize = 4;
+    colorBuffer.numItems = (gridN+1)*(gridN+1);
+
     // Specify normals to be able to do lighting calculations
     tVertexNormalBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexNormalBuffer);
@@ -93,6 +104,10 @@ function drawTerrain(){
  gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);
  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, tVertexPositionBuffer.itemSize, 
                          gl.FLOAT, false, 0, 0);
+
+ // Bind color buffer
+ gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+ gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
  // Bind normal buffer
  gl.bindBuffer(gl.ARRAY_BUFFER, tVertexNormalBuffer);
@@ -297,9 +312,23 @@ function setupShaders() {
   shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
   shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
   shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
+  shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
+  shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
+  shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
 }
 
-
+//-------------------------------------------------------------------------
+/**
+ * Sends material information to the shader
+ * @param {Float32Array} dcolor diffuse material color
+ * @param {Float32Array} acolor ambient material color
+ * @param {Float32Array} scolor specular material color 
+ */
+function uploadMaterialToShader(dcolor, acolor, scolor) {
+  gl.uniform3fv(shaderProgram.uniformDiffuseMaterialColor, dcolor);
+  gl.uniform3fv(shaderProgram.uniformAmbientMaterialColor, acolor);
+  gl.uniform3fv(shaderProgram.uniformSpecularMaterialColor, scolor);
+}
 //-------------------------------------------------------------------------
 /**
  * Sends light information to the shader
@@ -346,26 +375,13 @@ function draw() {
     vec3.set(transformVec,0.0,-0.25,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(-60));
-    // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(25));     
+    // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(25));   
+    
+    uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
+    uploadMaterialToShader([0.0,1.0,0.0],[0.0,1.0,0.0],[0.0,1.0,0.0]);
     setMatrixUniforms();
-    
-    if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
-    {
-      uploadLightsToShader([20,20,20],[1.0,0.0,0.0],[1.0,0.5,0.0],[1.0,0.0,0.0]);
-      drawTerrain();
-    }
-    
-    if(document.getElementById("wirepoly").checked){
-      uploadLightsToShader([20,20,20],[1.0,0.0,0.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
-      drawTerrainEdges();
-    }
-
-    if(document.getElementById("wireframe").checked){
-      uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
-      drawTerrainEdges();
-    }
+    drawTerrain();
     mvPopMatrix();
-  
 }
 
 //----------------------------------------------------------------------------------
