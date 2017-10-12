@@ -44,8 +44,8 @@ function setupTerrainBuffers() {
     var fTerrain=[];
     var nTerrain=[];
     var eTerrain=[];
-    // Grid size 2^n by 2^n
-    var gridN=64;
+    // Grid size 2^n by 2^n: 256
+    var gridN=32;
 
     // Size of the terrain, terrain out of the screen will be clipped
     var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain);
@@ -351,17 +351,17 @@ function draw() {
     
     if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
     {
-      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[1.0,0.5,0.0],[0.0,0.0,0.0]);
+      uploadLightsToShader([1,1,1],[1.0,0.0,0.0],[1.0,0.5,0.0],[1.0,0.0,0.0]);
       drawTerrain();
     }
     
     if(document.getElementById("wirepoly").checked){
-      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0]);
+      uploadLightsToShader([1,1,1],[1.0,0.0,0.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
       drawTerrainEdges();
     }
 
     if(document.getElementById("wireframe").checked){
-      uploadLightsToShader([0,1,1],[1.0,1.0,1.0],[0.0,0.0,0.0],[0.0,0.0,0.0]);
+      uploadLightsToShader([1,1,1],[1.0,1.0,1.0],[0.0,0.0,0.0],[1.0,0.0,0.0]);
       drawTerrainEdges();
     }
     mvPopMatrix();
@@ -387,15 +387,5 @@ function animate() {
   setupBuffers();
   gl.clearColor(0.53, 0.81, 0.98, 1.0);
   gl.enable(gl.DEPTH_TEST);
-  tick();
-}
-
-//----------------------------------------------------------------------------------
-/**
- * Tick called for every animation frame.
- */
-function tick() {
-    requestAnimFrame(tick);
-    draw();
-    animate();
+  draw();
 }
