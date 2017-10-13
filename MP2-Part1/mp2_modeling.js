@@ -117,34 +117,11 @@ function diamondSquare(topLeft, bottomRight, size, gridSize, vertexArray, scale)
     vertexArray[leftIndex] = (vertexArray[tlIndex]+vertexArray[mid]+vertexArray[blIndex]+leftLeftValue)/4+randomNumber()*scale;
     
     // Apply diamond square algorithm recursively
-    var reducer = 1.4;
+    var reducer = 1.6;
     diamondSquare(topLeft, mid, (size+1)/2, gridSize, vertexArray, scale/reducer);
     diamondSquare(topIndex - 2, rightIndex, (size+1)/2, gridSize, vertexArray, scale/reducer);
     diamondSquare(leftIndex - 2, bottomIndex, (size+1)/2, gridSize, vertexArray, scale/reducer);
     diamondSquare(mid - 2, bottomRight, (size+1)/2, gridSize, vertexArray, scale/reducer);
-}
-
-
-/**
- * Generates line values from faces in faceArray
- * @param {Array} faceArray array of faces for triangles
- * @param {Array} lineArray array of normals for triangles, storage location after generation
- */
-function generateLinesFromIndexedTriangles(faceArray,lineArray)
-{
-    numTris=faceArray.length/3;
-    for(var f=0;f<numTris;f++)
-    {
-        var fid=f*3;
-        lineArray.push(faceArray[fid]);
-        lineArray.push(faceArray[fid+1]);
-        
-        lineArray.push(faceArray[fid+1]);
-        lineArray.push(faceArray[fid+2]);
-        
-        lineArray.push(faceArray[fid+2]);
-        lineArray.push(faceArray[fid]);
-    }
 }
 
 /**
@@ -195,7 +172,7 @@ function computePerVertexNormal(vertexArray, faceArray, normalArray)
  */
 function randomNumber()
 {
-    return Math.random()*0.5;
+    return Math.random();
 }
 /**
  * Check if two point are in the same row

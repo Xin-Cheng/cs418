@@ -44,8 +44,8 @@ function setupTerrainBuffers() {
     var fTerrain=[];
     var nTerrain=[];
     var eTerrain=[];
-    // Grid size 2^n by 2^n: 256
-    var gridN=32;
+    // Grid size 2^n by 2^n
+    var gridN=64;
 
     // Size of the terrain, terrain out of the screen will be clipped
     var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain);
@@ -71,17 +71,6 @@ function setupTerrainBuffers() {
                   gl.STATIC_DRAW);
     tIndexTriBuffer.itemSize = 1;
     tIndexTriBuffer.numItems = numT*3;
-    
-    //Setup Edges
-     generateLinesFromIndexedTriangles(fTerrain,eTerrain);  
-     tIndexEdgeBuffer = gl.createBuffer();
-     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexEdgeBuffer);
-     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(eTerrain),
-                  gl.STATIC_DRAW);
-     tIndexEdgeBuffer.itemSize = 1;
-     tIndexEdgeBuffer.numItems = eTerrain.length;
-    
-     
 }
 
 //-------------------------------------------------------------------------
@@ -297,23 +286,8 @@ function setupShaders() {
   shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
   shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
   shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
-  // shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
-  // shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
-  // shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
 }
 
-//-------------------------------------------------------------------------
-/**
- * Sends material information to the shader
- * @param {Float32Array} dcolor diffuse material color
- * @param {Float32Array} acolor ambient material color
- * @param {Float32Array} scolor specular material color 
- */
-// function uploadMaterialToShader(dcolor, acolor, scolor) {
-//   gl.uniform3fv(shaderProgram.uniformDiffuseMaterialColor, dcolor);
-//   gl.uniform3fv(shaderProgram.uniformAmbientMaterialColor, acolor);
-//   gl.uniform3fv(shaderProgram.uniformSpecularMaterialColor, scolor);
-// }
 //-------------------------------------------------------------------------
 /**
  * Sends light information to the shader
@@ -348,7 +322,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(75), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(50), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
@@ -359,11 +333,9 @@ function draw() {
     mvPushMatrix();
     vec3.set(transformVec,0.0,-0.25,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-60));
-    // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(25));   
+    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-50));
     
-    uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
-    // uploadMaterialToShader([1.0,1.0,0.0],[0.0,1.0,0.0],[0.0,1.0,0.0]);
+    uploadLightsToShader([-20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0]);
     setMatrixUniforms();
     drawTerrain();
     mvPopMatrix();
