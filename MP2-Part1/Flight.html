@@ -16,11 +16,13 @@
              uniform mat3 uNMatrix;
              varying vec3 vNormal;
              varying vec3 vPosition;
+             varying vec3 position;
              
              void main(void) {
                 // Get the vertex position in eye coordinates
                 vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
                 vPosition = vertexPositionEye4.xyz / vertexPositionEye4.w;
+                position = vec3(aVertexPosition);
                 //Calaulate the normal
                 vNormal = normalize(uNMatrix * aVertexNormal);
                 
@@ -32,14 +34,15 @@
             precision mediump float;
             varying vec3 vNormal;
             varying vec3 vPosition;
-            
+            varying vec3 position;
+
             uniform vec3 uLightPosition;
             uniform vec3 uAmbientLightColor;
             uniform vec3 uDiffuseLightColor;
             uniform vec3 uSpecularLightColor;
-            uniform vec3 uAmbientMaterialColor;
-            uniform vec3 uDiffuseMaterialColor;
-            uniform vec3 uSpecularMaterialColor;
+            //uniform vec3 uAmbientMaterialColor;
+            //uniform vec3 uDiffuseMaterialColor;
+            //uniform vec3 uSpecularMaterialColor;
 
             const float shininess = 10.0;
             
@@ -47,6 +50,11 @@
             void main(void) {
                     
                 vec4 vColor;
+                vec3 white = vec3(1.0, 1.0, 1.0);
+                vec3 red = vec3(1.0, 0.0, 0.0);
+                vec3 green = vec3(0.0, 1.0, 0.0);
+                vec3 blue = vec3(0.0, 0.0, 1.0);
+
                 // Calculate the vector (l) to the light source
                 vec3 vectorToLightSource = normalize(uLightPosition - vPosition);
                 
@@ -67,10 +75,25 @@
                 float specularLightWeightning = pow(ndoth, shininess);
             
                 // Sum up all three reflection components and send to the fragment shader
-                vColor = vec4(((uAmbientLightColor*uAmbientMaterialColor)
-                    + (uDiffuseLightColor*uDiffuseMaterialColor) * diffuseLightWeightning
-                    + (uSpecularLightColor*uSpecularMaterialColor) * specularLightWeightning),1.0);
-            
+                //vColor = vec4(((uAmbientLightColor*uAmbientMaterialColor)
+                //    + (uDiffuseLightColor*uDiffuseMaterialColor) * diffuseLightWeightning
+                //    + (uSpecularLightColor*uSpecularMaterialColor) * specularLightWeightning),1.0);
+                if(position.z > 0.9)
+                {
+                    vColor = vec4(((uAmbientLightColor*white)+(uDiffuseLightColor*white) * diffuseLightWeightning+(uSpecularLightColor*white) * specularLightWeightning),1.0);
+                }
+                if(position.z <= 0.9 && position.z > 0.85)
+                {
+                    vColor = vec4(((uAmbientLightColor*red)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
+                }
+                if(position.z <= 0.85 && position.z > 0.65)
+                {
+                    vColor = vec4(((uAmbientLightColor*green)+(uDiffuseLightColor*green) * diffuseLightWeightning+(uSpecularLightColor*green) * specularLightWeightning),1.0);
+                }
+                if(position.z <= 0.65)
+                {
+                    vColor = vec4(((uAmbientLightColor*blue)+(uDiffuseLightColor*blue) * diffuseLightWeightning+(uSpecularLightColor*blue) * specularLightWeightning),1.0);
+                }
                 gl_FragColor = vColor;
              }
         </script>

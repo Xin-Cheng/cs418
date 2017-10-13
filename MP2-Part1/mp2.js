@@ -45,7 +45,7 @@ function setupTerrainBuffers() {
     var nTerrain=[];
     var eTerrain=[];
     // Grid size 2^n by 2^n: 256
-    var gridN=16;
+    var gridN=32;
 
     // Size of the terrain, terrain out of the screen will be clipped
     var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain);
@@ -297,9 +297,9 @@ function setupShaders() {
   shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
   shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
   shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
-  shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
-  shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
-  shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
+  // shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
+  // shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
+  // shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
 }
 
 //-------------------------------------------------------------------------
@@ -309,11 +309,11 @@ function setupShaders() {
  * @param {Float32Array} acolor ambient material color
  * @param {Float32Array} scolor specular material color 
  */
-function uploadMaterialToShader(dcolor, acolor, scolor) {
-  gl.uniform3fv(shaderProgram.uniformDiffuseMaterialColor, dcolor);
-  gl.uniform3fv(shaderProgram.uniformAmbientMaterialColor, acolor);
-  gl.uniform3fv(shaderProgram.uniformSpecularMaterialColor, scolor);
-}
+// function uploadMaterialToShader(dcolor, acolor, scolor) {
+//   gl.uniform3fv(shaderProgram.uniformDiffuseMaterialColor, dcolor);
+//   gl.uniform3fv(shaderProgram.uniformAmbientMaterialColor, acolor);
+//   gl.uniform3fv(shaderProgram.uniformSpecularMaterialColor, scolor);
+// }
 //-------------------------------------------------------------------------
 /**
  * Sends light information to the shader
@@ -363,7 +363,7 @@ function draw() {
     // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(25));   
     
     uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
-    uploadMaterialToShader([1.0,1.0,0.0],[0.0,1.0,0.0],[0.0,1.0,0.0]);
+    // uploadMaterialToShader([1.0,1.0,0.0],[0.0,1.0,0.0],[0.0,1.0,0.0]);
     setMatrixUniforms();
     drawTerrain();
     mvPopMatrix();
