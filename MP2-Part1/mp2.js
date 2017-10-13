@@ -1,3 +1,8 @@
+/**
+ * @author Xin Cheng <xcheng11@illinois.edu>
+ * Code adapted from https://courses.engr.illinois.edu/cs418/fa2017/
+ */
+//-------------------------------------------------------------------------
 
 var gl;
 var canvas;

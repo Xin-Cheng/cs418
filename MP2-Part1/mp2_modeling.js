@@ -1,4 +1,10 @@
 /**
+ * @author Xin Cheng <xcheng11@illinois.edu>
+ * Code adapted from https://courses.engr.illinois.edu/cs418/fa2017/
+ */
+//-------------------------------------------------------------------------
+
+/**
  * Iteratively generate terrain from numeric inputs
  * @param {number} n
  * @param {number} minX Minimum X value
