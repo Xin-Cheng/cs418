@@ -16,9 +16,6 @@ var tIndexTriBuffer;
 //Create a place to store the traingle edges
 var tIndexEdgeBuffer;
 
-//Create a place to store the color of each vertex
-var colorBuffer;
-
 // View parameters
 var eyePt = vec3.fromValues(0.0,0.0,0.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
@@ -47,25 +44,17 @@ function setupTerrainBuffers() {
     var fTerrain=[];
     var nTerrain=[];
     var eTerrain=[];
-    var color=[];
     // Grid size 2^n by 2^n: 256
-    var gridN=32;
+    var gridN=16;
 
     // Size of the terrain, terrain out of the screen will be clipped
-    var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain, color);
+    var numT = terrainFromIteration(gridN, -2.0,2.0,-2.5,1.0, vTerrain, fTerrain, nTerrain);
     console.log("Generated ", numT, " triangles"); 
     tVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);      
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vTerrain), gl.STATIC_DRAW);
     tVertexPositionBuffer.itemSize = 3;
     tVertexPositionBuffer.numItems = (gridN+1)*(gridN+1);
-    
-    // Fill the color buffers with color according to the height value
-    colorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color), gl.STATIC_DRAW);
-    colorBuffer.itemSize = 4;
-    colorBuffer.numItems = (gridN+1)*(gridN+1);
 
     // Specify normals to be able to do lighting calculations
     tVertexNormalBuffer = gl.createBuffer();
@@ -104,10 +93,6 @@ function drawTerrain(){
  gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);
  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, tVertexPositionBuffer.itemSize, 
                          gl.FLOAT, false, 0, 0);
-
- // Bind color buffer
- gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
- gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
  // Bind normal buffer
  gl.bindBuffer(gl.ARRAY_BUFFER, tVertexNormalBuffer);
@@ -378,7 +363,7 @@ function draw() {
     // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(25));   
     
     uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
-    uploadMaterialToShader([0.0,1.0,0.0],[0.0,1.0,0.0],[0.0,1.0,0.0]);
+    uploadMaterialToShader([1.0,1.0,0.0],[0.0,1.0,0.0],[0.0,1.0,0.0]);
     setMatrixUniforms();
     drawTerrain();
     mvPopMatrix();
