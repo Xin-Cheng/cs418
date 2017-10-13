@@ -63,6 +63,28 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
 }
 
 /**
+ * Generates line values from faces in faceArray
+ * @param {Array} faceArray array of faces for triangles
+ * @param {Array} lineArray array of normals for triangles, storage location after generation
+ */
+function generateLinesFromIndexedTriangles(faceArray,lineArray)
+{
+    numTris=faceArray.length/3;
+    for(var f=0;f<numTris;f++)
+    {
+        var fid=f*3;
+        lineArray.push(faceArray[fid]);
+        lineArray.push(faceArray[fid+1]);
+        
+        lineArray.push(faceArray[fid+1]);
+        lineArray.push(faceArray[fid+2]);
+        
+        lineArray.push(faceArray[fid+2]);
+        lineArray.push(faceArray[fid]);
+    }
+}
+
+/**
  * Compute the height value of each vertex using diamond square algorithm
  * @param {number} topLeft the index of top left coner
  * @param {number} bottomRight the index of bottom right coner

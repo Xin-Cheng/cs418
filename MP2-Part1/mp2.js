@@ -76,6 +76,15 @@ function setupTerrainBuffers() {
                   gl.STATIC_DRAW);
     tIndexTriBuffer.itemSize = 1;
     tIndexTriBuffer.numItems = numT*3;
+
+    //Setup Edges
+    generateLinesFromIndexedTriangles(fTerrain,eTerrain);  
+    tIndexEdgeBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexEdgeBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(eTerrain),
+                  gl.STATIC_DRAW);
+    tIndexEdgeBuffer.itemSize = 1;
+    tIndexEdgeBuffer.numItems = eTerrain.length;
 }
 
 //-------------------------------------------------------------------------
@@ -339,10 +348,27 @@ function draw() {
     vec3.set(transformVec,0.0,-0.25,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(-50));
-    
-    uploadLightsToShader([-20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0]);
     setMatrixUniforms();
-    drawTerrain();
+    
+    // uploadLightsToShader([-20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0]);
+    // drawTerrain();
+
+    if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
+    {
+      uploadLightsToShader([-20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0]);
+      drawTerrain();
+    }
+    
+    if(document.getElementById("wirepoly").checked){
+      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0]);
+      drawTerrainEdges();
+    }
+
+    if(document.getElementById("wireframe").checked){
+      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0]);
+      drawTerrainEdges();
+    }
+
     mvPopMatrix();
 }
 

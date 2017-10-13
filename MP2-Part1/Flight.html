@@ -6,7 +6,7 @@
         <title>
             Flight
         </title>
-        
+        <h1>MP2: Flight</h1>
         <script id="shader-vs" type="x-shader/x-vertex">
             attribute vec3 aVertexNormal;
             attribute vec3 aVertexPosition;
@@ -41,7 +41,7 @@
             uniform vec3 uDiffuseLightColor;
             uniform vec3 uSpecularLightColor;
 
-            const float shininess = 200.0;
+            const float shininess = 50.0;
             
             
             void main(void) {
@@ -101,5 +101,14 @@
 </head>
   
 <body onload="startup();">
- <canvas id="myGLCanvas" width="800" height="800"></canvas>
-</body></html>
+    <canvas id="myGLCanvas" width="800" height="800"></canvas>
+    <form id="input_form">
+        <fieldset style="width:770px">
+            <legend>Rendering Parameters</legend>
+            <input type="radio" name="primitive" id="wireframe" value="wireframe"> Wireframe<br>
+            <input type="radio" name="primitive" id="polygon" value="polygon"> Polygon<br>
+            <input type="radio" name="primitive" id="wirepoly" value="wirepoly" checked=""> Polygon with Edges  
+        </fieldset>
+    </form>
+</body>
+</html>
