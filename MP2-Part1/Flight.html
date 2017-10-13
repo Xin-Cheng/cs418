@@ -82,15 +82,15 @@
                 {
                     vColor = vec4(((uAmbientLightColor*white)+(uDiffuseLightColor*white) * diffuseLightWeightning+(uSpecularLightColor*white) * specularLightWeightning),1.0);
                 }
-                if(position.z <= 0.9 && position.z > 0.85)
+                if(position.z <= 0.9 && position.z > 0.8)
                 {
                     vColor = vec4(((uAmbientLightColor*red)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
                 }
-                if(position.z <= 0.85 && position.z > 0.65)
+                if(position.z <= 0.8 && position.z > 0.6)
                 {
                     vColor = vec4(((uAmbientLightColor*green)+(uDiffuseLightColor*green) * diffuseLightWeightning+(uSpecularLightColor*green) * specularLightWeightning),1.0);
                 }
-                if(position.z <= 0.65)
+                if(position.z <= 0.6)
                 {
                     vColor = vec4(((uAmbientLightColor*blue)+(uDiffuseLightColor*blue) * diffuseLightWeightning+(uSpecularLightColor*blue) * specularLightWeightning),1.0);
                 }

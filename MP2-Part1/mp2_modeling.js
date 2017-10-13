@@ -49,6 +49,7 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
     vertexArray[3*n-1] = randomNumber();
     vertexArray[vertexArray.length+2-3*n] = randomNumber();
     diamondSquare(0, vertexArray.length-1, n + 1, n + 1, vertexArray, 1);
+    normalizeHeight(vertexArray);
     // Compute pervertex normal   
     computePerVertexNormal(vertexArray, faceArray, normalArray);
 
@@ -217,4 +218,27 @@ function isInSameRow(first, second, gridSize)
 function isInSameColumn(first, second, gridSize)
 {
     return Boolean(first%(gridSize*3) == second%(gridSize*3));
+}
+
+/**
+ * Normalize the height value
+ * @param {Array} vertexArray array that contains vertices generated
+ */
+function normalizeHeight(vertexArray)
+{
+    // Find the minimum and maximum value of height
+    var min = Number.MAX_VALUE;
+    var max = Number.MIN_VALUE;
+    for(var i = 0; i < vertexArray.length-2; i+=3)
+    {
+        if(vertexArray[i+2] < min) {min = vertexArray[i+2];}
+        if(vertexArray[i+2] > max) {max = vertexArray[i+2];}
+    }
+
+    // Normalize height value
+    var diff = max - min;
+    for(var i = 0; i < vertexArray.length-2; i+=3)
+    {
+        vertexArray[i+2] = (vertexArray[i+2] - min)/diff;
+    }
 }
