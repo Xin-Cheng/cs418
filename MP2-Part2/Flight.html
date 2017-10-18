@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)https://courses.engr.illinois.edu/cs418/fa2017/HelloTerrain.html -->
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>
+            Flight
+        </title>
+        <h1>MP2: Flight</h1>
+        <script id="shader-vs" type="x-shader/x-vertex">
+            attribute vec3 aVertexNormal;
+            attribute vec3 aVertexPosition;
+            
+             uniform mat4 uMVMatrix;
+             uniform mat4 uPMatrix;
+             uniform mat3 uNMatrix;
+             varying vec3 vNormal;
+             varying vec3 vPosition;
+             varying vec3 position;
+             
+             void main(void) {
+                // Get the vertex position in eye coordinates
+                vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
+                vPosition = vertexPositionEye4.xyz / vertexPositionEye4.w;
+                position = vec3(aVertexPosition);
+                //Calaulate the normal
+                vNormal = normalize(uNMatrix * aVertexNormal);
+                
+                gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+            }
+        </script>
+
+        <script id="shader-fs" type="x-shader/x-fragment">
+            precision mediump float;
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            varying vec3 position;
+
+            uniform vec3 uLightPosition;
+            uniform vec3 uAmbientLightColor;
+            uniform vec3 uDiffuseLightColor;
+            uniform vec3 uSpecularLightColor;
+
+            const float shininess = 50.0;
+            
+            
+            void main(void) {
+                    
+                vec4 vColor;
+                vec3 white = vec3(0.93, 0.91, 0.91);
+                vec3 red = vec3(0.92, 0.35, 0.0);
+                vec3 green = vec3(0.13, 0.5, 0.13);
+                vec3 blue = vec3(0.0, 0.41, 0.58);
+
+                // Calculate the vector (l) to the light source
+                vec3 vectorToLightSource = normalize(uLightPosition - vPosition);
+                
+                // Calculate n dot l for diffuse lighting
+                float diffuseLightWeightning = max(dot(vNormal, vectorToLightSource), 0.0);
+               
+                // The camera in eye coordinates is located in the origin and is pointing
+                // along the negative z-axis. Calculate viewVector (v) 
+                // in eye coordinates as:
+                // (0.0, 0.0, 0.0) - vertexPositionEye3
+                vec3 viewVectorEye = -normalize(vPosition);
+
+                // Calculate the half way vector
+                vec3 halfwayVector = normalize(vectorToLightSource + viewVectorEye);
+                
+                float ndoth = max(dot(vNormal, halfwayVector), 0.0);
+
+                float specularLightWeightning = pow(ndoth, shininess);
+            
+                // Sum up all three reflection components and send to the fragment shader
+                // Colors are generated according to the height value
+                if(position.z > 0.9)
+                {
+                    vColor = vec4(((uAmbientLightColor*white)+(uDiffuseLightColor*white) * diffuseLightWeightning+(uSpecularLightColor*white) * specularLightWeightning),1.0);
+                }
+                if(position.z <= 0.9 && position.z > 0.8)
+                {
+                    vColor = vec4(((uAmbientLightColor*red)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
+                }
+                if(position.z <= 0.8 && position.z > 0.6)
+                {
+                    vColor = vec4(((uAmbientLightColor*green)+(uDiffuseLightColor*green) * diffuseLightWeightning+(uSpecularLightColor*green) * specularLightWeightning),1.0);
+                }
+                if(position.z <= 0.6)
+                {
+                    vColor = vec4(((uAmbientLightColor*blue)+(uDiffuseLightColor*blue) * diffuseLightWeightning+(uSpecularLightColor*blue) * specularLightWeightning),1.0);
+                }
+                gl_FragColor = vColor;
+             }
+        </script>
+
+        <script src="./mp2_files/gl-matrix-min.js"></script>
+        <script src="./mp2_files/webgl-utils.js"></script>
+        <script src="./mp2.js"></script>
+        <script src="./mp2_modeling.js"></script>
+
+</head>
+  
+<body onload="startup();">
+    <canvas id="myGLCanvas" width="800" height="800"></canvas>
+    <form id="input_form">
+        <fieldset style="width:770px">
+            <legend>Rendering Parameters</legend>
+            <input type="radio" name="primitive" id="wireframe" value="wireframe"> Wireframe<br>
+            <input type="radio" name="primitive" id="polygon" value="polygon"> Polygon<br>
+            <input type="radio" name="primitive" id="wirepoly" value="wirepoly" checked=""> Polygon with Edges  
+        </fieldset>
+    </form>
+</body>
+</html>
