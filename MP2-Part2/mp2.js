@@ -300,6 +300,8 @@ function setupShaders() {
   shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
   shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
   shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
+
+  shaderProgram.uniformFog = gl.getUniformLocation(shaderProgram, "uFog");   
 }
 
 //-------------------------------------------------------------------------
@@ -310,11 +312,13 @@ function setupShaders() {
  * @param {Float32Array} d Diffuse light strength
  * @param {Float32Array} s Specular light strength
  */
-function uploadLightsToShader(loc,a,d,s) {
+function uploadLightsToShader(loc,a,d,s, fog) {
   gl.uniform3fv(shaderProgram.uniformLightPositionLoc, loc);
   gl.uniform3fv(shaderProgram.uniformAmbientLightColorLoc, a);
   gl.uniform3fv(shaderProgram.uniformDiffuseLightColorLoc, d);
   gl.uniform3fv(shaderProgram.uniformSpecularLightColorLoc, s);
+
+  gl.uniform1f(shaderProgram.uniformFog, fog);
 }
 
 //----------------------------------------------------------------------------------
@@ -350,19 +354,20 @@ function draw() {
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(-55));
     setMatrixUniforms();
 
+    fog = document.getElementById("fogChecked").checked ? 1.0 : 0.0; 
     if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
     {
-      uploadLightsToShader([20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0]);
+      uploadLightsToShader([20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0], fog);
       drawTerrain();
     }
     
     if(document.getElementById("wirepoly").checked){
-      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0]);
+      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0], fog);
       drawTerrainEdges();
     }
 
     if(document.getElementById("wireframe").checked){
-      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0]);
+      uploadLightsToShader([0,1,1],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0], fog);
       drawTerrainEdges();
     }
 
