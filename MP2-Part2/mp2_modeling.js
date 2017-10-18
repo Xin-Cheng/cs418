@@ -133,7 +133,7 @@ function diamondSquare(step, gridSize, vertexArray, scale)
         }
         count++;
     }
-    diamondSquare(step/2, gridSize, vertexArray, scale*0.5);
+    diamondSquare(halfStep, gridSize, vertexArray, scale*0.5);
 }
 
 function convertCoordinate(row, column, gridSize)

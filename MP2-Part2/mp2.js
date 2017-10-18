@@ -53,7 +53,7 @@ function setupTerrainBuffers() {
     var gridN=128;
 
     // Size of the terrain, terrain out of the screen will be clipped
-    var numT = terrainFromIteration(gridN, -1.0,1.0,-1.0,1.0, vTerrain, fTerrain, nTerrain);
+    var numT = terrainFromIteration(gridN, -3.0,3.0,-3.0,3.0, vTerrain, fTerrain, nTerrain);
     console.log("Generated ", numT, " triangles"); 
     tVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);      
@@ -349,9 +349,6 @@ function draw() {
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(-50));
     setMatrixUniforms();
-    
-    // uploadLightsToShader([-20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0]);
-    // drawTerrain();
 
     if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
     {
