@@ -110,10 +110,10 @@ function diamondSquare(step, gridSize, vertexArray, scale)
     }
     // square step
     var count = 0;
-    for(var i = 0; i < gridSize; i+=halfStep)
+    for(var i = 0; i <= gridSize; i+=halfStep)
     {
         var j = count % 2 == 0 ? halfStep : 0; 
-        for(; j < gridSize; j+=step)
+        for(; j <= gridSize; j+=step)
         {
             index = convertCoordinate(i, j, gridSize);
             var corner = 0;
