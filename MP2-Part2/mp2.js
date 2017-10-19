@@ -199,6 +199,38 @@ function degToRad(degrees) {
 }
 
 //----------------------------------------------------------------------------------
+//Code to handle user interaction
+var currentlyPressedKeys = {};
+
+function handleKeyDown(event) {
+        currentlyPressedKeys[event.keyCode] = true;
+}
+
+
+function handleKeyUp(event) {
+        currentlyPressedKeys[event.keyCode] = false;
+}
+
+function handleKeys() {
+    
+        if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
+            // Left cursor key or A
+            eyePt[0]-= 0.02;
+        } else if (currentlyPressedKeys[39] || currentlyPressedKeys[68]) {
+            // Right cursor key or D
+            eyePt[0]+= 0.02;
+        } 
+
+        if (currentlyPressedKeys[38] || currentlyPressedKeys[87]) {
+            // Up cursor key or W
+            eyePt[1]+= 0.02;
+        } else if (currentlyPressedKeys[40] || currentlyPressedKeys[83]) {
+            // Down cursor key
+            eyePt[1]-= 0.02;
+        } 
+}
+
+//----------------------------------------------------------------------------------
 /**
  * Creates a context for WebGL
  * @param {element} canvas WebGL canvas
@@ -396,6 +428,8 @@ function animate() {
   setupBuffers();
   gl.clearColor(0.53, 0.81, 0.98, 1.0);
   gl.enable(gl.DEPTH_TEST);
+  document.onkeydown = handleKeyDown;
+  document.onkeyup = handleKeyUp;
   tick();
 }
 
@@ -405,6 +439,7 @@ function animate() {
  */
 function tick() {
   requestAnimFrame(tick);
+  handleKeys();
   draw();
   animate();
 }
