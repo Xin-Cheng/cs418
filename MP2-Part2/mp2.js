@@ -311,6 +311,7 @@ function setupShaders() {
  * @param {Float32Array} a Ambient light strength
  * @param {Float32Array} d Diffuse light strength
  * @param {Float32Array} s Specular light strength
+ * @param {Float32Array} fog Fog status
  */
 function uploadLightsToShader(loc,a,d,s, fog) {
   gl.uniform3fv(shaderProgram.uniformLightPositionLoc, loc);
@@ -355,6 +356,7 @@ function draw() {
     setMatrixUniforms();
 
     fog = document.getElementById("fogChecked").checked ? 1.0 : 0.0; 
+    
     if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
     {
       uploadLightsToShader([20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0], fog);

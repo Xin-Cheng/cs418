@@ -3,6 +3,7 @@
 <html lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="styles.css">
         <title>
             Flight
         </title>
@@ -91,7 +92,8 @@
                 {
                     vColor = vec4(((uAmbientLightColor*blue)+(uDiffuseLightColor*blue) * diffuseLightWeightning+(uSpecularLightColor*blue) * specularLightWeightning),1.0);
                 }
-                                 
+                
+                // Compute fog
                 float fogCoord = (gl_FragCoord.y/gl_FragCoord.w);
                 vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);            
                 const float LOG2 = 1.442695;
@@ -115,11 +117,19 @@
     <canvas id="myGLCanvas" width="800" height="800"></canvas>
     <form id="input_form">
         <fieldset style="width:770px">
-            <legend>Rendering Parameters</legend>
+            <legend><h3>Rendering Parameters</h3></legend>
             <input type="radio" name="primitive" id="wireframe" value="wireframe"> Wireframe
             <input type="radio" name="primitive" id="polygon" value="polygon"> Polygon
             <input type="radio" name="primitive" id="wirepoly" value="wirepoly" checked=""> Polygon with Edges<br>
-            <input type="checkbox" name="fog" id="fogChecked" value="fog"> Turn On The Fog (Check to turn on the fog)
+            <h4>Fog switch:</h4> 
+            <label class="switch">
+                <input type="checkbox" id="fogChecked">
+                <div class="slider round">
+                    <span class="on">ON</span>
+                    <span class="off">OFF</span>
+                </div>
+            </label>
+            
         </fieldset>
     </form>
 </body>
