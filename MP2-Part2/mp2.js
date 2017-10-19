@@ -38,7 +38,14 @@ var pMatrix = mat4.create();
 
 var mvMatrixStack = [];
 
+// Dimenstion of terrain
+var boundaryFar = -2.0;
+var boundaryNear = 3.0;
+var boundaryLeft = -3.0;
+var boundaryRight = 3.0;
 
+var speed = 0.002;
+var rate = 0.0005;
 //-------------------------------------------------------------------------
 /**
  * Populates terrain buffers for terrain generation
@@ -53,7 +60,7 @@ function setupTerrainBuffers() {
     var gridN=64;
 
     // Size of the terrain, terrain out of the screen will be clipped
-    var numT = terrainFromIteration(gridN, -2.0,2.0,-3.0,1.0, vTerrain, fTerrain, nTerrain);
+    var numT = terrainFromIteration(gridN, boundaryLeft,boundaryRight,boundaryFar,boundaryNear, vTerrain, fTerrain, nTerrain);
     console.log("Generated ", numT, " triangles"); 
     tVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);      
@@ -212,7 +219,6 @@ function handleKeyUp(event) {
 }
 
 function handleKeys() {
-    
         if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
             // Left cursor key or A
             eyePt[0]-= 0.02;
@@ -225,9 +231,18 @@ function handleKeys() {
             // Up cursor key or W
             eyePt[1]+= 0.02;
         } else if (currentlyPressedKeys[40] || currentlyPressedKeys[83]) {
-            // Down cursor key
+            // Down cursor key or S
             eyePt[1]-= 0.02;
         } 
+
+        // Accelerte and decelerate
+        if (currentlyPressedKeys[90] || currentlyPressedKeys[187]) {
+          // z key
+          speed += rate;
+        } else if ((currentlyPressedKeys[88] || currentlyPressedKeys[189]) && speed >= 2*rate) {
+          // x key
+          speed -= rate;
+        }
 }
 
 //----------------------------------------------------------------------------------
@@ -375,6 +390,10 @@ function draw() {
     // We'll use perspective 
     mat4.perspective(pMatrix,degToRad(50), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
+    // Move forwared
+    if(eyePt[1] > boundaryNear-boundaryFar - 1.5) { eyePt[1] = 0.0; }
+    vec3.add(eyePt, eyePt, vec3.fromValues(0.0, speed, 0.0));
+    
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
     // Then generate the lookat matrix and initialize the MV matrix to that view
@@ -384,7 +403,7 @@ function draw() {
     mvPushMatrix();
     vec3.set(transformVec,0.0,-0.25,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-55));
+    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-65));
     setMatrixUniforms();
 
     fog = document.getElementById("fogChecked").checked ? 1.0 : 0.0; 
