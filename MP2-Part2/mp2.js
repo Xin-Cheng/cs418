@@ -221,30 +221,31 @@ function handleKeyUp(event) {
 }
 
 function handleKeys() {
-        if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
-            // Left cursor key or A
-            quaternion = quat.fromEuler(quaternion, 0.0, degToRad(-5), 0.0);
-        } else if (currentlyPressedKeys[39] || currentlyPressedKeys[68]) {
-            // Right cursor key or D
-            quaternion = quat.fromEuler(quaternion, 0.0, degToRad(5), 0.0);
-        } 
-        if (currentlyPressedKeys[38] || currentlyPressedKeys[87]) {
-            // Up cursor key or W
-            quaternion = quat.fromEuler(quaternion, degToRad(-5), 0.0, 0.0);
-            
-        } else if (currentlyPressedKeys[40] || currentlyPressedKeys[83]) {
-            // Down cursor key or S
-            quaternion = quat.fromEuler(quaternion, degToRad(5), 0.0, 0.0);
-        } 
+  var degree = 3;
+  if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
+      // Left cursor key or A
+      quaternion = quat.fromEuler(quaternion, 0.0, degToRad(-degree), 0.0);
+  } else if (currentlyPressedKeys[39] || currentlyPressedKeys[68]) {
+      // Right cursor key or D
+      quaternion = quat.fromEuler(quaternion, 0.0, degToRad(degree), 0.0);
+  } 
+  if (currentlyPressedKeys[38] || currentlyPressedKeys[87]) {
+      // Up cursor key or W
+      quaternion = quat.fromEuler(quaternion, degToRad(-degree), 0.0, 0.0);
+      
+  } else if (currentlyPressedKeys[40] || currentlyPressedKeys[83]) {
+      // Down cursor key or S
+      quaternion = quat.fromEuler(quaternion, degToRad(degree), 0.0, 0.0);
+  } 
 
-        // Accelerte and decelerate
-        if (currentlyPressedKeys[90] || currentlyPressedKeys[187]) {
-          // z key
-          speed += rate;
-        } else if ((currentlyPressedKeys[88] || currentlyPressedKeys[189]) && speed >= 2*rate) {
-          // x key
-          speed -= rate;
-        }
+  // Accelerte and decelerate
+  if (currentlyPressedKeys[90] || currentlyPressedKeys[187]) {
+    // z key
+    speed += rate;
+  } else if ((currentlyPressedKeys[88] || currentlyPressedKeys[189]) && speed >= 2*rate) {
+    // x key
+    speed -= rate;
+  }
 }
 
 //----------------------------------------------------------------------------------
