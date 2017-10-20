@@ -44,6 +44,7 @@ var boundaryNear = 3.0;
 var boundaryLeft = -3.0;
 var boundaryRight = 3.0;
 
+// Parameter of flight
 var speed = 0.002;
 var rate = 0.0005;
 //-------------------------------------------------------------------------
@@ -57,7 +58,7 @@ function setupTerrainBuffers() {
     var nTerrain=[];
     var eTerrain=[];
     // Grid size 2^n by 2^n
-    var gridN=64;
+    var gridN=128;
 
     // Size of the terrain, terrain out of the screen will be clipped
     var numT = terrainFromIteration(gridN, boundaryLeft,boundaryRight,boundaryFar,boundaryNear, vTerrain, fTerrain, nTerrain);
@@ -387,7 +388,10 @@ function setupBuffers() {
  */
 function draw() { 
     var transformVec = vec3.create();
+
+    // Quaternion rotation matrix
     var rotationMatrix = mat4.create();
+    // Apply new quaternion
     quat.multiply(orientationQuaternion, quaternion, orientationQuaternion);
     mat4.fromQuat(rotationMatrix, orientationQuaternion);
   
