@@ -218,10 +218,11 @@ function handleKeyDown(event) {
 
 function handleKeyUp(event) {
         currentlyPressedKeys[event.keyCode] = false;
+        quaternion = quat.fromEuler(quaternion, 0.0, 0.0, 0.0);
 }
 
 function handleKeys() {
-  var degree = 3;
+  var degree = 5;
   if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
       // Left cursor key or A
       quaternion = quat.fromEuler(quaternion, 0.0, degToRad(-degree), 0.0);
