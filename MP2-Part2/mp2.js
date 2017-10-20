@@ -208,6 +208,8 @@ function degToRad(degrees) {
 //----------------------------------------------------------------------------------
 //Code to handle user interaction
 var currentlyPressedKeys = {};
+var quaternion = quat.create();
+var orientationQuaternion = quat.create();
 
 function handleKeyDown(event) {
         currentlyPressedKeys[event.keyCode] = true;
@@ -221,18 +223,18 @@ function handleKeyUp(event) {
 function handleKeys() {
         if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
             // Left cursor key or A
-            eyePt[0]-= 0.02;
+            quaternion = quat.fromEuler(quaternion, 0.0, degToRad(-5), 0.0);
         } else if (currentlyPressedKeys[39] || currentlyPressedKeys[68]) {
             // Right cursor key or D
-            eyePt[0]+= 0.02;
+            quaternion = quat.fromEuler(quaternion, 0.0, degToRad(5), 0.0);
         } 
-
         if (currentlyPressedKeys[38] || currentlyPressedKeys[87]) {
             // Up cursor key or W
-            eyePt[1]+= 0.02;
+            quaternion = quat.fromEuler(quaternion, degToRad(-5), 0.0, 0.0);
+            
         } else if (currentlyPressedKeys[40] || currentlyPressedKeys[83]) {
             // Down cursor key or S
-            eyePt[1]-= 0.02;
+            quaternion = quat.fromEuler(quaternion, degToRad(5), 0.0, 0.0);
         } 
 
         // Accelerte and decelerate
@@ -383,6 +385,9 @@ function setupBuffers() {
  */
 function draw() { 
     var transformVec = vec3.create();
+    var rotationMatrix = mat4.create();
+    quat.multiply(orientationQuaternion, quaternion, orientationQuaternion);
+    mat4.fromQuat(rotationMatrix, orientationQuaternion);
   
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -398,12 +403,13 @@ function draw() {
     vec3.add(viewPt, eyePt, viewDir);
     // Then generate the lookat matrix and initialize the MV matrix to that view
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);    
- 
+    
     //Draw Terrain
     mvPushMatrix();
     vec3.set(transformVec,0.0,-0.25,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(-65));
+    mat4.mul(mvMatrix, rotationMatrix, mvMatrix);
     setMatrixUniforms();
 
     fog = document.getElementById("fogChecked").checked ? 1.0 : 0.0; 
