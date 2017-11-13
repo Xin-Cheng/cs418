@@ -278,7 +278,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(10), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+    mat4.perspective(pMatrix,degToRad(90), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
  
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
@@ -287,7 +287,7 @@ function draw() {
 
     //Draw 
     mvPushMatrix();
-    vec3.set(transformVec,0.0,0.0,-10.0);
+    vec3.set(transformVec,0.0,0.0,-1.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
     mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
