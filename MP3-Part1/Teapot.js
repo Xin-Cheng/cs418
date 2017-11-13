@@ -36,6 +36,12 @@ var bottomTexture;
 var rightTexture;
 var leftTexture;
 
+// View parameters
+var eyePt = vec3.fromValues(0.0,0.0,0.0);
+var viewDir = vec3.fromValues(0.0,0.0,-1.0);
+var up = vec3.fromValues(0.0,1.0,0.0);
+var viewPt = vec3.fromValues(0.0,0.0,0.0);
+
 // For animation 
 var then =0;
 var modelXRotationRadians = degToRad(0);
@@ -272,8 +278,13 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(10), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
  
+    // We want to look down -z, so create a lookat point in that direction    
+    vec3.add(viewPt, eyePt, viewDir);
+    // Then generate the lookat matrix and initialize the MV matrix to that view
+    mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
+
     //Draw 
     mvPushMatrix();
     vec3.set(transformVec,0.0,0.0,-10.0);
@@ -529,6 +540,6 @@ function setupBuffers() {
 function tick() {
     requestAnimFrame(tick);
     draw();
-    animate();
+    // animate();
 }
 
