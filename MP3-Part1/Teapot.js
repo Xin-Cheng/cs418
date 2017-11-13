@@ -22,10 +22,6 @@ var pMatrix = mat4.create();
 var mvMatrixStack = [];
 
 // Create a place to store the texture
-
-var cubeImage;
-var cubeTexture;
-
 var frontImage;
 var backImage;
 var topImage;
@@ -201,6 +197,8 @@ function setupShaders() {
  * Draw a cube based on buffers.
  */
 function drawCube(){
+  var size = 2;
+  var count = 6;
   // Draw the cube by binding the array buffer to the cube's vertices
   // array, setting attributes, and pushing it to GL.
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
@@ -216,52 +214,52 @@ function drawCube(){
   // Draw the cube.
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
   setMatrixUniforms();
-  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 0*size);
 
-  // // Back
-  // gl.activeTexture(gl.TEXTURE1);
-  // gl.bindTexture(gl.TEXTURE_2D, backTexture);
-  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler1"), 1);
-  // gl.uniform1f(shaderProgram.uniformFace, 1.0);
-  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
-  // setMatrixUniforms();
-  // gl.drawElements(gl.TRIANGLES, 11, gl.UNSIGNED_SHORT, 6);
+  // Back
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, backTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler1"), 1);
+  gl.uniform1f(shaderProgram.uniformFace, 1.0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  setMatrixUniforms();
+  gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 6*size);
 
-  // // Top
-  // gl.activeTexture(gl.TEXTURE2);
-  // gl.bindTexture(gl.TEXTURE_2D, topTexture);
-  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler2"), 2);
-  // gl.uniform1f(shaderProgram.uniformFace, 2.0);
-  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
-  // setMatrixUniforms();
-  // gl.drawElements(gl.TRIANGLES, 14, gl.UNSIGNED_SHORT, 12);
+  // Top
+  gl.activeTexture(gl.TEXTURE2);
+  gl.bindTexture(gl.TEXTURE_2D, topTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler2"), 2);
+  gl.uniform1f(shaderProgram.uniformFace, 2.0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  setMatrixUniforms();
+  gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 12*size);
 
-  // // Bottom
-  // gl.activeTexture(gl.TEXTURE3);
-  // gl.bindTexture(gl.TEXTURE_2D, bottomTexture);
-  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler3"), 3);
-  // gl.uniform1f(shaderProgram.uniformFace, 3.0);
-  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
-  // setMatrixUniforms();
-  // gl.drawElements(gl.TRIANGLES, 17, gl.UNSIGNED_SHORT, 18);
+  // Bottom
+  gl.activeTexture(gl.TEXTURE3);
+  gl.bindTexture(gl.TEXTURE_2D, bottomTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler3"), 3);
+  gl.uniform1f(shaderProgram.uniformFace, 3.0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  setMatrixUniforms();
+  gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 18*size);
 
-  // // Right
-  // gl.activeTexture(gl.TEXTURE4);
-  // gl.bindTexture(gl.TEXTURE_2D, rightTexture);
-  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler4"), 4);
-  // gl.uniform1f(shaderProgram.uniformFace, 4.0);
-  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
-  // setMatrixUniforms();
-  // gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_SHORT, 0);
+  // Right
+  gl.activeTexture(gl.TEXTURE4);
+  gl.bindTexture(gl.TEXTURE_2D, rightTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler4"), 4);
+  gl.uniform1f(shaderProgram.uniformFace, 4.0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  setMatrixUniforms();
+  gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 24*size);
 
-  // // Left
-  // gl.activeTexture(gl.TEXTURE5);
-  // gl.bindTexture(gl.TEXTURE_2D, leftTexture);
-  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler5"), 5);
-  // gl.uniform1f(shaderProgram.uniformFace, 5.0);
-  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
-  // setMatrixUniforms();
-  // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+  // Left
+  gl.activeTexture(gl.TEXTURE5);
+  gl.bindTexture(gl.TEXTURE_2D, leftTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler5"), 5);
+  gl.uniform1f(shaderProgram.uniformFace, 5.0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  setMatrixUniforms();
+  gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 30*size);
 }
 
 /**
