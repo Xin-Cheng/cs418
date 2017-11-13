@@ -26,6 +26,20 @@ var mvMatrixStack = [];
 var cubeImage;
 var cubeTexture;
 
+var frontImage;
+var backImage;
+var topImage;
+var bottomImage;
+var rightImage;
+var leftImage;
+
+var frontTexture;
+var backTexture;
+var topTexture;
+var bottomTexture;
+var rightTexture;
+var leftTexture;
+
 // For animation 
 var then =0;
 var modelXRotationRadians = degToRad(0);
@@ -179,35 +193,75 @@ function setupShaders() {
     
   shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+
+  shaderProgram.uniformFace = gl.getUniformLocation(shaderProgram, "uFace");
 }
 
 /**
  * Draw a cube based on buffers.
  */
 function drawCube(){
-
   // Draw the cube by binding the array buffer to the cube's vertices
   // array, setting attributes, and pushing it to GL.
-
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
   // Set the texture coordinates attribute for the vertices.
-
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeTCoordBuffer);
   gl.vertexAttribPointer(shaderProgram.texCoordAttribute, 2, gl.FLOAT, false, 0, 0);
-
   // Specify the texture to map onto the faces.
-
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
-  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
-
+  gl.bindTexture(gl.TEXTURE_2D, frontTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler0"), 0);
+  gl.uniform1f(shaderProgram.uniformFace, 0.0);
   // Draw the cube.
-
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
   setMatrixUniforms();
-  gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+
+  // // Back
+  // gl.activeTexture(gl.TEXTURE1);
+  // gl.bindTexture(gl.TEXTURE_2D, backTexture);
+  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler1"), 1);
+  // gl.uniform1f(shaderProgram.uniformFace, 1.0);
+  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  // setMatrixUniforms();
+  // gl.drawElements(gl.TRIANGLES, 11, gl.UNSIGNED_SHORT, 6);
+
+  // // Top
+  // gl.activeTexture(gl.TEXTURE2);
+  // gl.bindTexture(gl.TEXTURE_2D, topTexture);
+  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler2"), 2);
+  // gl.uniform1f(shaderProgram.uniformFace, 2.0);
+  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  // setMatrixUniforms();
+  // gl.drawElements(gl.TRIANGLES, 14, gl.UNSIGNED_SHORT, 12);
+
+  // // Bottom
+  // gl.activeTexture(gl.TEXTURE3);
+  // gl.bindTexture(gl.TEXTURE_2D, bottomTexture);
+  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler3"), 3);
+  // gl.uniform1f(shaderProgram.uniformFace, 3.0);
+  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  // setMatrixUniforms();
+  // gl.drawElements(gl.TRIANGLES, 17, gl.UNSIGNED_SHORT, 18);
+
+  // // Right
+  // gl.activeTexture(gl.TEXTURE4);
+  // gl.bindTexture(gl.TEXTURE_2D, rightTexture);
+  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler4"), 4);
+  // gl.uniform1f(shaderProgram.uniformFace, 4.0);
+  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  // setMatrixUniforms();
+  // gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_SHORT, 0);
+
+  // // Left
+  // gl.activeTexture(gl.TEXTURE5);
+  // gl.bindTexture(gl.TEXTURE_2D, leftTexture);
+  // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler5"), 5);
+  // gl.uniform1f(shaderProgram.uniformFace, 5.0);
+  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeTriIndexBuffer);
+  // setMatrixUniforms();
+  // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 }
 
 /**
@@ -262,18 +316,37 @@ function animate() {
  * Creates texture for application to cube.
  */
 function setupTextures() {
-  cubeTexture = gl.createTexture();
- gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
-// Fill the texture with a 1x1 blue pixel.
-gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-              new Uint8Array([0, 0, 255, 255]));
+  frontImage = new Image();
+  backImage = new Image();
+  topImage = new Image();
+  bottomImage = new Image();
+  rightImage = new Image();
+  leftImage = new Image();
 
-  cubeImage = new Image();
-  cubeImage.onload = function() { handleTextureLoaded(cubeImage, cubeTexture); }
-  cubeImage.src = "UIUC_I_mark.png";
-   // https://goo.gl/photos/SUo7Zz9US1AKhZq49
+  frontTexture = gl.createTexture();
+  backTexture = gl.createTexture();
+  topTexture = gl.createTexture();
+  bottomTexture = gl.createTexture();
+  rightTexture = gl.createTexture();
+  leftTexture = gl.createTexture();
+
+  fillTexture(frontImage, frontTexture, "images/pos-z.png");
+  fillTexture(backImage, backTexture, "images/neg-z.png");
+  fillTexture(topImage, topTexture, "images/pos-y.png");
+  fillTexture(bottomImage, bottomTexture, "images/neg-y.png");
+  fillTexture(rightImage, rightTexture, "images/pos-x.png");
+  fillTexture(leftImage, leftTexture, "images/neg-x.png");
 }
 
+function fillTexture(image, texture, src) {
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  // Fill the texture with a 1x1 blue pixel.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+              new Uint8Array([0, 0, 255, 255]));
+  image.onload = function() { handleTextureLoaded(image, texture); }
+  image.src = src;
+}
 /**
  * @param {number} value Value to determine whether it is a power of 2
  * @return {boolean} Boolean of whether value is a power of 2
