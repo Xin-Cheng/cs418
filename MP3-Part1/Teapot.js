@@ -389,6 +389,32 @@ function handleTextureLoaded(image, texture) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 }
 
+
+/**
+ * Sets up buffers for teapot.
+ */
+/**
+ * Populate buffers with data
+ */
+var teapotVertices = [];
+var teapotFaces = [];
+
+function parseObjData(teapotData) {
+  var dataArray = Array.from(teapotData).join('').split('\n');
+  var size = 50;
+  document.getElementById("demo").innerHTML = dataArray[0];
+  for(var i = 0; i < size; i++) {
+    var linValue = dataArray[i].split(' '); 
+    var value = linValue.slice(1, 4);
+    if (linValue[0] == "v") {
+      for(var j = 0; j < 3; j++) {value[j] = parseFloat(value[j]);}
+      teapotVertices.push(value);
+    } else {
+      for(var j = 0; j < 3; j++) {value[j] = parseInt(value[j]);}
+      teapotFaces.push(value);
+    }
+  }
+}
 /**
  * Sets up buffers for cube.
  */
@@ -531,6 +557,8 @@ function setupBuffers() {
   setupShaders();
   setupBuffers();
   setupTextures();
+
+  readTextFile("teapot_0.obj", parseObjData);
   tick();
 }
 
