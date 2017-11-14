@@ -45,7 +45,7 @@ var rightTexture;
 var leftTexture;
 
 // View parameters
-var eyePt = vec3.fromValues(0.0,0.0,10.0);
+var eyePt = vec3.fromValues(0.0,0.0,5.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
 var up = vec3.fromValues(0.0,1.0,0.0);
 var viewPt = vec3.fromValues(0.0,0.0,0.0);
@@ -243,17 +243,18 @@ function setupShaders(vshader,fshader) {
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
     
   if(vshader == "shader-teapot-vs") {
-
+    shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
+    gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
     shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
     shaderProgram.uniformLightPositionLoc = gl.getUniformLocation(shaderProgram, "uLightPosition");    
     shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
     shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
     shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
-    shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
-    shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
-    shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
+    // shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
+    // shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
+    // shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
   
-    shaderProgram.uniformShininess = gl.getUniformLocation(shaderProgram, "uShininess");   
+    // shaderProgram.uniformShininess = gl.getUniformLocation(shaderProgram, "uShininess");   
   }  
 }
 
@@ -382,25 +383,24 @@ function draw() {
 
     var scaler = 1;
     mat4.scale(mvMatrix,mvMatrix, [scaler, scaler, scaler]);
-    mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
-    mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+    // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
+    // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+    // mat4.rotateZ(mvMatrix,mvMatrix,modelYRotationRadians);
     // mat4.rotateX(mvMatrix, mvMatrix, degToRad(90));
     // mat4.rotateY(mvMatrix, mvMatrix, degToRad(90));
     // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(90));
     // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
     
-    R=1.0;G=1.0;B=0.0;shiny=20.0;
-    
-    uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
-    uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
+    uploadLightsToShader([20,20,20],[0.2,0.2,0.2],[0.79,0.88,1.0],[1.0,1.0,1.0]);
+    // uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
 
     uploadNormalMatrixToShader(); 
     setMatrixUniforms();  
     if(isLoaded) {
       drawTeapot();
     }
+    
     mvPopMatrix();
-
 }
 
 /**
@@ -519,6 +519,9 @@ function parseObjData(teapotData) {
       value = linValue.slice(1, 4)
       for(var j = 0; j < 3; j++) {value[j] = parseFloat(value[j]);}
       teapotVertices = teapotVertices.concat(value);
+      teapotNormals.push(0);
+      teapotNormals.push(0);
+      teapotNormals.push(0);
       // console.log(value.toString());
     } else if(linValue[0] == "f") {
       faceNumer++;
@@ -574,7 +577,8 @@ function computePerVertexNormal(vertexArray, faceArray, normalArray)
         normalArray[i+1] = normal[1];
         normalArray[i+2] = normal[2];
     }
-    console.log("Per vertex normal.");
+    console.log(normalArray);
+    console.log(normalArray.length);
 }
 
 /**
