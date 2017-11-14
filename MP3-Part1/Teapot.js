@@ -413,32 +413,35 @@ function draw() {
     // Then generate the lookat matrix and initialize the MV matrix to that view
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
 
+    var lightPosEye4 = vec4.fromValues(20.0,20.0,20.0,1.0);
+    lightPosEye4 = vec4.transformMat4(lightPosEye4,lightPosEye4,mvMatrix);
+    //console.log(vec4.str(lightPosEye4))
+    var lightPosEye = vec3.fromValues(lightPosEye4[0],lightPosEye4[1],lightPosEye4[2]);
+
       // draw teapot
       setupShaders("shader-teapot-vs", "shader-teapot-fs");
       mvPushMatrix();
+
       // mat4.identity(mvMatrix);
-      vec3.set(transformVec,0.1,0.0,4.5);
+      vec3.set(transformVec,0.15,0.0,4.2);
       
       mat4.translate(mvMatrix, mvMatrix,transformVec);
-  
+
       var scaler = 0.1;
       mat4.scale(mvMatrix,mvMatrix, [scaler, -scaler, scaler]);
 
       mat4.rotateX(mvMatrix,mvMatrix,degToRad(xdir));
       mat4.rotateY(mvMatrix,mvMatrix,degToRad(ydir));
       mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
- 
-      
-      uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
-      
+
+      uploadLightsToShader(lightPosEye,[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
       uploadTextureToShader();
-  
+      
       uploadNormalMatrixToShader(); 
       setMatrixUniforms();  
       if(isLoaded) {
         drawTeapot();
       }
-      // quaternion = quat.fromEuler(quaternion, 0.0, 0.0, 0.0);
       mvPopMatrix();
     
     // draw skybox
