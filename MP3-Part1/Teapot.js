@@ -24,6 +24,9 @@ var mvMatrix = mat4.create();
 //Create Projection matrix
 var pMatrix = mat4.create();
 
+// Create the normal
+var nMatrix = mat3.create();
+
 var mvMatrixStack = [];
 
 // Create a place to store the texture
@@ -42,7 +45,7 @@ var rightTexture;
 var leftTexture;
 
 // View parameters
-var eyePt = vec3.fromValues(0.0,0.0,0.0);
+var eyePt = vec3.fromValues(0.0,0.0,10.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
 var up = vec3.fromValues(0.0,1.0,0.0);
 var viewPt = vec3.fromValues(0.0,0.0,0.0);
@@ -67,6 +70,43 @@ function uploadProjectionMatrixToShader() {
                       false, pMatrix);
 }
 
+/**
+ * Generates and sends the normal matrix to the shader
+ */
+function uploadNormalMatrixToShader() {
+  mat3.fromMat4(nMatrix,mvMatrix);
+  mat3.transpose(nMatrix,nMatrix);
+  mat3.invert(nMatrix,nMatrix);
+  gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, nMatrix);
+}
+
+/**
+ * Sends material information to the shader
+ * @param {Float32Array} a diffuse material color
+ * @param {Float32Array} a ambient material color
+ * @param {Float32Array} a specular material color 
+ * @param {Float32} the shininess exponent for Phong illumination
+ */
+function uploadMaterialToShader(dcolor, acolor, scolor,shiny) {
+  gl.uniform3fv(shaderProgram.uniformDiffuseMaterialColor, dcolor);
+  gl.uniform3fv(shaderProgram.uniformAmbientMaterialColor, acolor);
+  gl.uniform3fv(shaderProgram.uniformSpecularMaterialColor, scolor);
+    
+  gl.uniform1f(shaderProgram.uniformShininess, shiny);
+}
+/**
+ * Sends light information to the shader
+ * @param {Float32Array} loc Location of light source
+ * @param {Float32Array} a Ambient light strength
+ * @param {Float32Array} d Diffuse light strength
+ * @param {Float32Array} s Specular light strength
+ */
+function uploadLightsToShader(loc,a,d,s) {
+  gl.uniform3fv(shaderProgram.uniformLightPositionLoc, loc);
+  gl.uniform3fv(shaderProgram.uniformAmbientLightColorLoc, a);
+  gl.uniform3fv(shaderProgram.uniformDiffuseLightColorLoc, d);
+  gl.uniform3fv(shaderProgram.uniformSpecularLightColorLoc, s);
+}
 /**
  * Pushes matrix onto modelview matrix stack
  */
@@ -174,9 +214,9 @@ function loadShaderFromDOM(id) {
 /**
  * Setup the fragment and vertex shaders
  */
-function setupShaders() {
-  vertexShader = loadShaderFromDOM("shader-vs");
-  fragmentShader = loadShaderFromDOM("shader-fs");
+function setupShaders(vshader,fshader) {
+  vertexShader = loadShaderFromDOM(vshader);
+  fragmentShader = loadShaderFromDOM(fshader);
   
   shaderProgram = gl.createProgram();
   gl.attachShader(shaderProgram, vertexShader);
@@ -189,10 +229,13 @@ function setupShaders() {
 
   gl.useProgram(shaderProgram);
 
+  if(vshader == "shader-vs") {
+    shaderProgram.texCoordAttribute = gl.getAttribLocation(shaderProgram, "aTexCoord");
+    console.log("Tex coord attrib: ", shaderProgram.texCoordAttribute);
+    gl.enableVertexAttribArray(shaderProgram.texCoordAttribute);
+  }
   
-  shaderProgram.texCoordAttribute = gl.getAttribLocation(shaderProgram, "aTexCoord");
-  console.log("Tex coord attrib: ", shaderProgram.texCoordAttribute);
-  gl.enableVertexAttribArray(shaderProgram.texCoordAttribute);
+
     
   shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
   console.log("Vertex attrib: ", shaderProgram.vertexPositionAttribute);
@@ -200,6 +243,16 @@ function setupShaders() {
     
   shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+  shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
+  shaderProgram.uniformLightPositionLoc = gl.getUniformLocation(shaderProgram, "uLightPosition");    
+  shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
+  shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
+  shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
+  shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
+  shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
+  shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
+
+  shaderProgram.uniformShininess = gl.getUniformLocation(shaderProgram, "uShininess");    
 
   shaderProgram.uniformFace = gl.getUniformLocation(shaderProgram, "uFace");
 }
@@ -274,6 +327,25 @@ function drawCube(){
 }
 
 /**
+ * Draws a teapot from the teapot buffer
+ */
+function drawTeapot() {
+  // Bind vertex buffer
+  gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, teapotVertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+ 
+  // Bind normal buffer
+  gl.bindBuffer(gl.ARRAY_BUFFER, teapotNormalBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, teapotNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);   
+     
+  //Draw 
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotTriIndexBuffer);
+  setMatrixUniforms();
+  uploadNormalMatrixToShader();
+  gl.drawElements(gl.TRIANGLES, teapotTriIndexBuffer.numItems, gl.UNSIGNED_SHORT,0);  
+}
+
+/**
  * Draw call that applies matrix transformations to cube
  */
 function draw() { 
@@ -283,23 +355,49 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(90), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+    mat4.perspective(pMatrix,degToRad(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
  
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
     // Then generate the lookat matrix and initialize the MV matrix to that view
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
 
-    //Draw 
+    // draw skybox
+    setupShaders("shader-vs", "shader-fs");
     mvPushMatrix();
-    vec3.set(transformVec,0.0,0.0,-1.0);
+    vec3.set(transformVec,0.0,0.0,-10.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
     mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+
+    R=1.0;G=0.0;B=0.0;shiny=20.0;
+    
+    uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
+    uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
+
     setMatrixUniforms();    
     drawCube();
     mvPopMatrix();
-  
+
+    // draw teapot
+    setupShaders("shader-teapot-vs", "shader-teapot-fs");
+    mvPushMatrix();
+    vec3.set(transformVec,0.0,1.0,0.0);
+    mat4.translate(mvMatrix, mvMatrix,transformVec);
+    mat4.scale(mvMatrix,mvMatrix, [20, 20, 20]);
+    // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
+    // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+    
+    R=1.0;G=0.0;B=0.0;shiny=20.0;
+    
+    uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
+    uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
+
+    uploadNormalMatrixToShader(); 
+    setMatrixUniforms();   
+
+    drawTeapot();
+    mvPopMatrix();
 }
 
 /**
@@ -409,7 +507,6 @@ var faceNumer = 0;
 function parseObjData(teapotData) {
   var dataArray = Array.from(teapotData).join('').split('\n');
   var size = dataArray.length;
-  document.getElementById("demo").innerHTML = dataArray[0];
   for(var i = 0; i < size; i++) {
     var linValue = dataArray[i].split(' '); 
     var value;
@@ -627,11 +724,8 @@ function setupBuffers() {
   gl = createGLContext(canvas);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
-    
-  setupShaders();
   setupBuffers();
   setupTextures();
-
   readTextFile("teapot_0.obj", parseObjData);
   setupTeapotBuffers();
   tick();
