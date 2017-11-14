@@ -376,21 +376,27 @@ function drawTeapot() {
   gl.drawElements(gl.TRIANGLES, teapotTriIndexBuffer.numItems, gl.UNSIGNED_SHORT,0);  
 }
 
+
 /**
- * handle orbiting
+ *  An event listener for the keydown event.  It is installed by the init() function.  Rotates the reflective object.
  */
 var xdir = 0;
 var ydir = 0;
-var zdir = 0;
-function orbit(value, id) {
-  if(id == "xrange")
-    xdir += value;
-  if(id == "yrange")
-    ydir += value;
-  if(id == "zrange")
-    zdir += value;
-}
 
+function orbit(evt) {
+  var rotationChanged = true;
+  switch (evt.keyCode) {
+      case 37: ydir -= 0.15; break;        // left arrow
+      case 39: ydir +=  0.15; break;       // right arrow
+      case 38: xdir -= 0.15; break;        // up arrow
+      case 40: xdir += 0.15; break;        // down arrow
+      default: rotationChanged = false;
+  }
+  if (rotationChanged) {
+      evt.preventDefault();
+      draw();
+  }
+}
 /**
  * Draw call that applies matrix transformations to cube
  */
@@ -408,7 +414,7 @@ function draw() {
     // Then generate the lookat matrix and initialize the MV matrix to that view
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
 
-    var lightPosEye4 = vec4.fromValues(20.0,20.0,20.0,1.0);
+    var lightPosEye4 = vec4.fromValues(1.0,1.0,1.0,1.0);
     lightPosEye4 = vec4.transformMat4(lightPosEye4,lightPosEye4,mvMatrix);
     //console.log(vec4.str(lightPosEye4))
     var lightPosEye = vec3.fromValues(lightPosEye4[0],lightPosEye4[1],lightPosEye4[2]);
@@ -423,9 +429,9 @@ function draw() {
     var scaler = 0.1;
     mat4.scale(mvMatrix,mvMatrix, [-scaler, scaler, scaler]);
 
-    mat4.rotateX(mvMatrix,mvMatrix,degToRad(xdir));
-    mat4.rotateY(mvMatrix,mvMatrix,degToRad(ydir));
-    mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
+    mat4.rotateX(mvMatrix,mvMatrix,xdir);
+    mat4.rotateY(mvMatrix,mvMatrix,ydir);
+    // mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
 
     uploadLightsToShader(lightPosEye,[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
     uploadTextureToShader();
@@ -784,6 +790,7 @@ function setupBuffers() {
   setupBuffers();
   setupTextures();
   readTextFile("teapot_0.obj", parseObjData);  
+  document.addEventListener("keydown", orbit, false);
   tick();
 }
 
