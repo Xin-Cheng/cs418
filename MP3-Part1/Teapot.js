@@ -401,17 +401,20 @@ var teapotFaces = [];
 
 function parseObjData(teapotData) {
   var dataArray = Array.from(teapotData).join('').split('\n');
-  var size = 50;
+  var size = dataArray.length;
   document.getElementById("demo").innerHTML = dataArray[0];
   for(var i = 0; i < size; i++) {
     var linValue = dataArray[i].split(' '); 
-    var value = linValue.slice(1, 4);
+    var value;
     if (linValue[0] == "v") {
+      value = linValue.slice(1, 4)
       for(var j = 0; j < 3; j++) {value[j] = parseFloat(value[j]);}
-      teapotVertices.push(value);
+      teapotVertices = teapotVertices.concat(value);
     } else {
       for(var j = 0; j < 3; j++) {value[j] = parseInt(value[j]);}
-      teapotFaces.push(value);
+      value = linValue.slice(2, 5)
+      teapotFaces = teapotFaces.concat(value);
+      console.log(value.toString());
     }
   }
 }
