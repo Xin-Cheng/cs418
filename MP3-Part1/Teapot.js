@@ -13,6 +13,11 @@ var cubeVertexBuffer;
 // Create a place to store the triangles
 var cubeTriIndexBuffer;
 
+// Create places to store teapot geometry and triangles
+var teapotVertexBuffer;
+var teapotTriIndexBuffer;
+var teapotNormalBuffer;
+
 // Create ModelView matrix
 var mvMatrix = mat4.create();
 
@@ -399,6 +404,8 @@ function handleTextureLoaded(image, texture) {
 var teapotVertices = [];
 var teapotFaces = [];
 var teapotNormals = [];
+var vertexNumber = 0;
+var faceNumer = 0;
 function parseObjData(teapotData) {
   var dataArray = Array.from(teapotData).join('').split('\n');
   var size = dataArray.length;
@@ -407,15 +414,18 @@ function parseObjData(teapotData) {
     var linValue = dataArray[i].split(' '); 
     var value;
     if (linValue[0] == "v") {
+      vertexNumber++;
       value = linValue.slice(1, 4)
       for(var j = 0; j < 3; j++) {value[j] = parseFloat(value[j]);}
       teapotVertices = teapotVertices.concat(value);
     } else {
+      faceNumer++;
       for(var j = 0; j < 3; j++) {value[j] = parseInt(value[j]);}
       value = linValue.slice(2, 5)
       teapotFaces = teapotFaces.concat(value);
     }
   }
+  console.log("Teapot data populated!");
   computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
 }
 
@@ -459,13 +469,38 @@ function computePerVertexNormal(vertexArray, faceArray, normalArray)
         normalArray[i+1] = normal[1];
         normalArray[i+2] = normal[2];
     }
+    console.log("Per vertex normal.");
 }
 
 /**
- * Sets up buffers for cube.
+ * Sets up buffers for teapot and Populate buffers with data
  */
+function setupTeapotBuffers() {
+  // Create a buffer for the teapot's vertices.
+  teapotVertexBuffer = gl.createBuffer();
+  // Select the teapotVertexBuffer as the one to apply vertex operations to from here out.
+  gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexBuffer);
+  // Now pass the list of vertices into WebGL to build the shape.
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotVertices), gl.STATIC_DRAW);
+  teapotVertexBuffer.itemSize = 3;
+  teapotVertexBuffer.numItems = vertexNumber;
+
+  // Build the element array buffer; this specifies the indices into the vertex array for each face's vertices.
+  teapotTriIndexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotTriIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(teapotFaces), gl.STATIC_DRAW);
+  teapotTriIndexBuffer.itemSize = 1;
+  teapotTriIndexBuffer.numItems = faceNumer;
+
+  // Build the normal buffer
+  teapotNormalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, teapotNormalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotNormals), gl.STATIC_DRAW);
+  teapotNormalBuffer.itemSize = 3;
+  teapotNormalBuffer.numItems = vertexNumber;
+}
 /**
- * Populate buffers with data
+ * Sets up buffers for cube and Populate buffers with data
  */
 function setupBuffers() {
   // Create a buffer for the cube's vertices.
@@ -598,6 +633,7 @@ function setupBuffers() {
   setupTextures();
 
   readTextFile("teapot_0.obj", parseObjData);
+  setupTeapotBuffers();
   tick();
 }
 
