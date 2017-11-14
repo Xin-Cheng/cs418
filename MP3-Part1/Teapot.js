@@ -589,7 +589,6 @@ function computePerVertexNormal(vertexArray, faceArray, normalArray)
         normalArray[i+1] = normal[1];
         normalArray[i+2] = normal[2];
     }
-    console.log(normalArray);
     console.log(normalArray.length);
 }
 

@@ -137,16 +137,16 @@ void main() {
 <canvas id="myGLCanvas" width="800" height="800"></canvas>
 <br>
 <h3>Slide to rotate the teapot</h3>
-x: <input type="range" min="0" max="360" value="0" step="1" onchange="orbit(this.value, 'xrange')" />
+x: <input type="range" min="0" max="360" value="0" step="1" onchange="showValue(this.value, 'xrange'); orbit(this.value, 'xrange');" />
 <span id="xrange">0</span><br>
-y: <input type="range" min="0" max="360" value="0" step="1" onchange="orbit(this.value, 'yrange')" />
+y: <input type="range" min="0" max="360" value="0" step="1" onchange="showValue(this.value, 'yrange'); orbit(this.value, 'yrange')" />
 <span id="yrange">0</span><br>
-z: <input type="range" min="0" max="360" value="0" step="1" onchange="orbit(this.value, 'zrange')" />
+z: <input type="range" min="0" max="360" value="0" step="1" onchange="showValue(this.value, 'zrange'); orbit(this.value, 'zrange')" />
 <span id="zrange">0</span>
 <script type="text/javascript">
 function showValue(newValue, id)
 {
-	document.getElementById(id).innerHTML=newValue;
+  document.getElementById(id).innerHTML=newValue;
 }
 </script>
 </body>
