@@ -80,7 +80,7 @@ void main() {
 
       vec4 eyePos = uMVMatrix*vec4(vPosition, 1.0);
       vec4 N = uMVMatrix*vec4(vNormal, 1.0);
-      R = reflect(eyePos.xyz, N.xyz);
+      R = normalize(reflect(eyePos.xyz, N.xyz));
   }
 </script>
  
@@ -113,33 +113,41 @@ void main() {
       vec3 green = vec3(0.13, 0.5, 0.13);
       vec3 blue = vec3(0.0, 0.41, 0.58);
 
-      // Calculate the vector (l) to the light source
-      vec3 vectorToLightSource = normalize(uLightPosition - vPosition);
-      
-      // Calculate n dot l for diffuse lighting
-      float diffuseLightWeightning = max(dot(vNormal, vectorToLightSource), 0.0);
-     
-      // The camera in eye coordinates is located in the origin and is pointing
-      // along the negative z-axis. Calculate viewVector (v) 
-      // in eye coordinates as:
-      // (0.0, 0.0, 0.0) - vertexPositionEye3
-      vec3 viewVectorEye = -normalize(vPosition);
+      float face = 0.0;
+      vec2 textureCoordinate = vec2(0.0, 0.0);
+      // Calculate texture coordinates
+      if(abs(R[0]) > abs(R[1]) && abs(R[0]) > abs(R[2])) {
+        face = R[0];
+        textureCoordinate[0] = 0.5 + 0.5*R[1];
+        textureCoordinate[1] = 0.5 + 0.5*R[2];
 
-      // Calculate the half way vector
-      vec3 halfwayVector = normalize(vectorToLightSource + viewVectorEye);
-      
-      float ndoth = max(dot(vNormal, halfwayVector), 0.0);
+        if(face > 0.0) {
+          vColor = texture2D(uSampler4, textureCoordinate);
+        } else {
+          vColor = texture2D(uSampler5, textureCoordinate);
+        }
+      } else if(abs(R[1]) > abs(R[0]) && abs(R[1]) > abs(R[2])) {
+        face = R[1];
+        textureCoordinate[0] = 0.5 + 0.5*R[0];
+        textureCoordinate[1] = 0.5 + 0.5*R[2];
 
-      float specularLightWeightning = pow(ndoth, shininess);
-  
-      // Sum up all three reflection components and send to the fragment shader
-      const vec3 ambient_color = vec3(0.2, 0.0, 0.0);
-      const vec3 diffuse_color = vec3(0.6, 0.0, 0.0);
-      const vec3 specular_color = vec3(1.0, 1.0, 1.0);
-      // Colors are generated according to the height value
-      //vColor = vec4(((uAmbientLightColor*white)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
-      vColor = vec4(((ambient_color*white)+(uDiffuseLightColor*red) * diffuseLightWeightning+(diffuse_color*red) * specular_color),1.0);
-      gl_FragColor = vColor;  
+        if(face > 0.0) {
+          vColor = texture2D(uSampler2, textureCoordinate);
+        } else {
+          vColor = texture2D(uSampler3, textureCoordinate);
+        }
+      } else{
+        face = R[2];
+        textureCoordinate[0] = 0.5 + 0.5*R[0];
+        textureCoordinate[1] = 0.5 + 0.5*R[1];
+
+        if(face > 0.0) {
+          vColor = texture2D(uSampler0, textureCoordinate);
+        } else {
+          vColor = texture2D(uSampler1, textureCoordinate);
+        }
+      }
+      gl_FragColor = vColor; 
    }
 </script>
 </script>

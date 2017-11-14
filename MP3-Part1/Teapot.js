@@ -228,13 +228,10 @@ function setupShaders(vshader,fshader) {
   }
 
   gl.useProgram(shaderProgram);
-
-  if(vshader == "shader-vs") {
     shaderProgram.texCoordAttribute = gl.getAttribLocation(shaderProgram, "aTexCoord");
     // console.log("Tex coord attrib: ", shaderProgram.texCoordAttribute);
     gl.enableVertexAttribArray(shaderProgram.texCoordAttribute);
     shaderProgram.uniformFace = gl.getUniformLocation(shaderProgram, "uFace");
-  }
   
   shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
   // console.log("Vertex attrib: ", shaderProgram.vertexPositionAttribute);
@@ -250,11 +247,24 @@ function setupShaders(vshader,fshader) {
     shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
     shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
     shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
+
+    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler0"), 0);  
+    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler1"), 1);
+    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler2"), 2);
+    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler3"), 3);
+    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler4"), 4);
+    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler5"), 0);
     // shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
     // shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
     // shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
   
     // shaderProgram.uniformShininess = gl.getUniformLocation(shaderProgram, "uShininess");   
+    shaderProgram.uSampler0 = gl.getUniformLocation(shaderProgram, "uSampler0");
+    shaderProgram.uSampler1 = gl.getUniformLocation(shaderProgram, "uSampler1");
+    shaderProgram.uSampler2 = gl.getUniformLocation(shaderProgram, "uSampler2");
+    shaderProgram.uSampler3 = gl.getUniformLocation(shaderProgram, "uSampler3");
+    shaderProgram.uSampler4 = gl.getUniformLocation(shaderProgram, "uSampler4");
+    shaderProgram.uSampler5 = gl.getUniformLocation(shaderProgram, "uSampler5");
   }  
 }
 
@@ -327,6 +337,32 @@ function drawCube(){
   gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 30*size);
 }
 
+function uploadTextureToShader() {
+  gl.activeTexture(gl.TEXTURE5);
+  gl.bindTexture(gl.TEXTURE_2D, frontTexture);
+  gl.uniform1f(shaderProgram.uniformFace, 0.0);
+
+  gl.activeTexture(gl.TEXTURE5);
+  gl.bindTexture(gl.TEXTURE_2D, backTexture);
+  gl.uniform1f(shaderProgram.uniformFace, 1.0);
+
+  gl.activeTexture(gl.TEXTURE5);
+  gl.bindTexture(gl.TEXTURE_2D, topTexture);
+  gl.uniform1f(shaderProgram.uniformFace, 2.0);
+
+  gl.activeTexture(gl.TEXTURE5);
+  gl.bindTexture(gl.TEXTURE_2D, bottomTexture);
+  gl.uniform1f(shaderProgram.uniformFace, 3.0);
+
+  gl.activeTexture(gl.TEXTURE5);
+  gl.bindTexture(gl.TEXTURE_2D, rightTexture);
+  gl.uniform1f(shaderProgram.uniformFace, 4.0);
+
+  gl.activeTexture(gl.TEXTURE5);
+  gl.bindTexture(gl.TEXTURE_2D, leftTexture);
+  gl.uniform1f(shaderProgram.uniformFace, 5.0);
+
+}
 /**
  * Draws a teapot from the teapot buffer
  */
@@ -394,7 +430,8 @@ function draw() {
  
       
       uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
-      // uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
+      
+      uploadTextureToShader();
   
       uploadNormalMatrixToShader(); 
       setMatrixUniforms();  
@@ -414,7 +451,6 @@ function draw() {
     drawCube();
     mvPopMatrix();
 }
-
 /**
  * Animation to be called from tick. Updates global rotation values.
  */
