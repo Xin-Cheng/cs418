@@ -363,25 +363,25 @@ function draw() {
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
 
     // draw skybox
-    // setupShaders("shader-vs", "shader-fs");
-    // mvPushMatrix();
-    // vec3.set(transformVec,0.0,0.0,-9.0);
-    // mat4.translate(mvMatrix, mvMatrix,transformVec);
+    setupShaders("shader-vs", "shader-fs");
+    mvPushMatrix();
+    vec3.set(transformVec,0.0,0.0,-5.0);
+    mat4.translate(mvMatrix, mvMatrix,transformVec);
     // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
     // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
 
-    // setMatrixUniforms();    
-    // drawCube();
-    // mvPopMatrix();
+    setMatrixUniforms();    
+    drawCube();
+    mvPopMatrix();
 
     // draw teapot
     setupShaders("shader-teapot-vs", "shader-teapot-fs");
     mvPushMatrix();
     // mat4.identity(mvMatrix);
-    vec3.set(transformVec,0.0,0.0,-5.0);
+    vec3.set(transformVec,2.0,1.0,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
 
-    var scaler = 1;
+    var scaler = -0.5;
     mat4.scale(mvMatrix,mvMatrix, [scaler, scaler, scaler]);
     // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
     // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
@@ -391,7 +391,7 @@ function draw() {
     // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(90));
     // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
     
-    uploadLightsToShader([20,20,20],[0.2,0.2,0.2],[0.79,0.88,1.0],[1.0,1.0,1.0]);
+    uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
     // uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
 
     uploadNormalMatrixToShader(); 
