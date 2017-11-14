@@ -579,10 +579,11 @@ function parseObjData(teapotData) {
     }
   }
   isLoaded = true;
+  computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
   setupTeapotBuffers();
   console.log(faceNumer);
   // console.log(teapotFaces.toString());
-  computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
+
 }
 
 /**
@@ -646,7 +647,7 @@ function setupTeapotBuffers() {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotTriIndexBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(teapotFaces), gl.STATIC_DRAW);
   teapotTriIndexBuffer.itemSize = 1;
-  teapotTriIndexBuffer.numItems = faceNumer;
+  teapotTriIndexBuffer.numItems = faceNumer*3;
 
   // Build the normal buffer
   teapotNormalBuffer = gl.createBuffer();
