@@ -231,30 +231,30 @@ function setupShaders(vshader,fshader) {
 
   if(vshader == "shader-vs") {
     shaderProgram.texCoordAttribute = gl.getAttribLocation(shaderProgram, "aTexCoord");
-    console.log("Tex coord attrib: ", shaderProgram.texCoordAttribute);
+    // console.log("Tex coord attrib: ", shaderProgram.texCoordAttribute);
     gl.enableVertexAttribArray(shaderProgram.texCoordAttribute);
+    shaderProgram.uniformFace = gl.getUniformLocation(shaderProgram, "uFace");
   }
   
-
-    
   shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-  console.log("Vertex attrib: ", shaderProgram.vertexPositionAttribute);
+  // console.log("Vertex attrib: ", shaderProgram.vertexPositionAttribute);
   gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    
   shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-  shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-  shaderProgram.uniformLightPositionLoc = gl.getUniformLocation(shaderProgram, "uLightPosition");    
-  shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
-  shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
-  shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
-  shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
-  shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
-  shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
+    
+  if(vshader == "shader-teapot-vs") {
 
-  shaderProgram.uniformShininess = gl.getUniformLocation(shaderProgram, "uShininess");    
-
-  shaderProgram.uniformFace = gl.getUniformLocation(shaderProgram, "uFace");
+    shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
+    shaderProgram.uniformLightPositionLoc = gl.getUniformLocation(shaderProgram, "uLightPosition");    
+    shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");  
+    shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
+    shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
+    shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
+    shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
+    shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
+  
+    shaderProgram.uniformShininess = gl.getUniformLocation(shaderProgram, "uShininess");   
+  }  
 }
 
 /**
@@ -330,6 +330,7 @@ function drawCube(){
  * Draws a teapot from the teapot buffer
  */
 function drawTeapot() {
+  gl.polygonOffset(0,0);
   // Bind vertex buffer
   gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, teapotVertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -340,8 +341,6 @@ function drawTeapot() {
      
   //Draw 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotTriIndexBuffer);
-  setMatrixUniforms();
-  uploadNormalMatrixToShader();
   gl.drawElements(gl.TRIANGLES, teapotTriIndexBuffer.numItems, gl.UNSIGNED_SHORT,0);  
 }
 
@@ -355,7 +354,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(50), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
  
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
@@ -363,41 +362,45 @@ function draw() {
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
 
     // draw skybox
-    setupShaders("shader-vs", "shader-fs");
-    mvPushMatrix();
-    vec3.set(transformVec,0.0,0.0,-10.0);
-    mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
-    mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+    // setupShaders("shader-vs", "shader-fs");
+    // mvPushMatrix();
+    // vec3.set(transformVec,0.0,0.0,-9.0);
+    // mat4.translate(mvMatrix, mvMatrix,transformVec);
+    // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
+    // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
 
-    R=1.0;G=0.0;B=0.0;shiny=20.0;
-    
-    uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
-    uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
-
-    setMatrixUniforms();    
-    drawCube();
-    mvPopMatrix();
+    // setMatrixUniforms();    
+    // drawCube();
+    // mvPopMatrix();
 
     // draw teapot
     setupShaders("shader-teapot-vs", "shader-teapot-fs");
     mvPushMatrix();
-    vec3.set(transformVec,0.0,1.0,0.0);
+    // mat4.identity(mvMatrix);
+    vec3.set(transformVec,0.0,0.0,-5.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.scale(mvMatrix,mvMatrix, [20, 20, 20]);
-    // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
+
+    var scaler = 1;
+    mat4.scale(mvMatrix,mvMatrix, [scaler, scaler, scaler]);
+    mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
+    mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+    // mat4.rotateX(mvMatrix, mvMatrix, degToRad(90));
+    // mat4.rotateY(mvMatrix, mvMatrix, degToRad(90));
+    // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(90));
     // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
     
-    R=1.0;G=0.0;B=0.0;shiny=20.0;
+    R=1.0;G=1.0;B=0.0;shiny=20.0;
     
-    uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
+    uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
     uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
 
     uploadNormalMatrixToShader(); 
-    setMatrixUniforms();   
-
-    drawTeapot();
+    setMatrixUniforms();  
+    if(isLoaded) {
+      drawTeapot();
+    }
     mvPopMatrix();
+
 }
 
 /**
@@ -504,6 +507,7 @@ var teapotFaces = [];
 var teapotNormals = [];
 var vertexNumber = 0;
 var faceNumer = 0;
+var isLoaded = false;
 function parseObjData(teapotData) {
   var dataArray = Array.from(teapotData).join('').split('\n');
   var size = dataArray.length;
@@ -515,14 +519,18 @@ function parseObjData(teapotData) {
       value = linValue.slice(1, 4)
       for(var j = 0; j < 3; j++) {value[j] = parseFloat(value[j]);}
       teapotVertices = teapotVertices.concat(value);
-    } else {
+      // console.log(value.toString());
+    } else if(linValue[0] == "f") {
       faceNumer++;
-      for(var j = 0; j < 3; j++) {value[j] = parseInt(value[j]);}
       value = linValue.slice(2, 5)
+      for(var j = 0; j < 3; j++) {value[j] = parseInt(value[j])-1;}
       teapotFaces = teapotFaces.concat(value);
     }
   }
-  console.log("Teapot data populated!");
+  isLoaded = true;
+  setupTeapotBuffers();
+  console.log(faceNumer);
+  // console.log(teapotFaces.toString());
   computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
 }
 
@@ -595,6 +603,7 @@ function setupTeapotBuffers() {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotNormals), gl.STATIC_DRAW);
   teapotNormalBuffer.itemSize = 3;
   teapotNormalBuffer.numItems = vertexNumber;
+  console.log('cdd');
 }
 /**
  * Sets up buffers for cube and Populate buffers with data
@@ -726,8 +735,7 @@ function setupBuffers() {
   gl.enable(gl.DEPTH_TEST);
   setupBuffers();
   setupTextures();
-  readTextFile("teapot_0.obj", parseObjData);
-  setupTeapotBuffers();
+  readTextFile("teapot_0.obj", parseObjData);  
   tick();
 }
 
@@ -737,6 +745,6 @@ function setupBuffers() {
 function tick() {
     requestAnimFrame(tick);
     draw();
-    // animate();
+    animate();
 }
 
