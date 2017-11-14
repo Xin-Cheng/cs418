@@ -351,24 +351,14 @@ function drawTeapot() {
 var xdir = 0;
 var ydir = 0;
 var zdir = 0;
-var preXdir = 0;
-var preYdir = 0;
-var preZdir = 0;
-var quaternion = quat.create();
-var orientationQuaternion = quat.create();
-quaternion = quat.fromEuler(quaternion, 0.0, 0.0, 0.0);
+
 function orbit(value, id) {
   if(id == "xrange")
-    xdir = value;
+    xdir += value;
   if(id == "yrange")
-    ydir = value;
+    ydir += value;
   if(id == "zrange")
-    zdir = value;
-
-  quaternion = quat.fromEuler(quaternion, xdir-preXdir, ydir-preYdir, zdir-preZdir);
-  preXdir = xdir;
-  preYdir = ydir;
-  preZdir = zdir;
+    zdir += value;
 }
 /**
  * Draw call that applies matrix transformations to cube
@@ -386,25 +376,22 @@ function draw() {
     vec3.add(viewPt, eyePt, viewDir);
     // Then generate the lookat matrix and initialize the MV matrix to that view
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
-    var rotationMatrix = mat4.create();
-    quat.multiply(orientationQuaternion, quaternion, orientationQuaternion);
-    mat4.fromQuat(rotationMatrix, orientationQuaternion);
+
       // draw teapot
       setupShaders("shader-teapot-vs", "shader-teapot-fs");
       mvPushMatrix();
       // mat4.identity(mvMatrix);
-      vec3.set(transformVec,0.3,0.0,4.0);
+      vec3.set(transformVec,0.1,0.0,4.5);
       
       mat4.translate(mvMatrix, mvMatrix,transformVec);
   
-      var scaler = 0.2;
+      var scaler = 0.1;
       mat4.scale(mvMatrix,mvMatrix, [scaler, -scaler, scaler]);
-      // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
-      // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
-      // mat4.rotateZ(mvMatrix,mvMatrix,modelYRotationRadians);
-      // orbit();
-      mat4.mul(mvMatrix, rotationMatrix, mvMatrix);
-      // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+
+      mat4.rotateX(mvMatrix,mvMatrix,degToRad(xdir));
+      mat4.rotateY(mvMatrix,mvMatrix,degToRad(ydir));
+      mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
+ 
       
       uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
       // uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
@@ -414,7 +401,7 @@ function draw() {
       if(isLoaded) {
         drawTeapot();
       }
-      quaternion = quat.fromEuler(quaternion, 0.0, 0.0, 0.0);
+      // quaternion = quat.fromEuler(quaternion, 0.0, 0.0, 0.0);
       mvPopMatrix();
     
     // draw skybox
@@ -422,8 +409,6 @@ function draw() {
     mvPushMatrix();
     vec3.set(transformVec,0.0,0.0,5.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
-    // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
 
     setMatrixUniforms();    
     drawCube();
