@@ -58,6 +58,7 @@ void main() {
 <script id="shader-teapot-vs" type="x-shader/x-vertex">
   attribute vec3 aVertexNormal;
   attribute vec3 aVertexPosition;
+  varying vec3 R;
   
    uniform mat4 uMVMatrix;
    uniform mat4 uPMatrix;
@@ -65,6 +66,7 @@ void main() {
    varying vec3 vNormal;
    varying vec3 vPosition;
    varying vec3 position;
+   
    
    void main(void) {
       // Get the vertex position in eye coordinates
@@ -75,6 +77,10 @@ void main() {
       vNormal = normalize(uNMatrix * aVertexNormal);
       
       gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+
+      vec4 eyePos = uMVMatrix*vec4(vPosition, 1.0);
+      vec4 N = uMVMatrix*vec4(vNormal, 1.0);
+      R = reflect(eyePos.xyz, N.xyz);
   }
 </script>
  
@@ -82,17 +88,22 @@ void main() {
   precision mediump float;
   varying vec3 vNormal;
   varying vec3 vPosition;
-  varying vec3 position;
+  varying vec3 R;
 
   uniform vec3 uLightPosition;
   uniform vec3 uAmbientLightColor;
   uniform vec3 uDiffuseLightColor;
   uniform vec3 uSpecularLightColor;
 
-  uniform float uFog;
-
-  const float shininess = 10.0;
+  const float shininess = 100.0;
   
+  // The texture.
+  uniform sampler2D uSampler0; // front
+  uniform sampler2D uSampler1; // back
+  uniform sampler2D uSampler2; // top
+  uniform sampler2D uSampler3; // bottom
+  uniform sampler2D uSampler4; // right
+  uniform sampler2D uSampler5; // left
   
   void main(void) {
           
@@ -122,8 +133,12 @@ void main() {
       float specularLightWeightning = pow(ndoth, shininess);
   
       // Sum up all three reflection components and send to the fragment shader
+      const vec3 ambient_color = vec3(0.2, 0.0, 0.0);
+      const vec3 diffuse_color = vec3(0.6, 0.0, 0.0);
+      const vec3 specular_color = vec3(1.0, 1.0, 1.0);
       // Colors are generated according to the height value
-      vColor = vec4(((uAmbientLightColor*white)+(uDiffuseLightColor*white) * diffuseLightWeightning+(uSpecularLightColor*white) * specularLightWeightning),1.0);
+      //vColor = vec4(((uAmbientLightColor*white)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
+      vColor = vec4(((ambient_color*white)+(uDiffuseLightColor*red) * diffuseLightWeightning+(diffuse_color*red) * specular_color),1.0);
       gl_FragColor = vColor;  
    }
 </script>
