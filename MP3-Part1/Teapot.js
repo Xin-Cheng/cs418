@@ -355,50 +355,54 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(50), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(85), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
  
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
     // Then generate the lookat matrix and initialize the MV matrix to that view
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
 
+      // draw teapot
+      setupShaders("shader-teapot-vs", "shader-teapot-fs");
+      mvPushMatrix();
+      // mat4.identity(mvMatrix);
+      vec3.set(transformVec,0.3,0.0,4.0);
+      
+      mat4.translate(mvMatrix, mvMatrix,transformVec);
+  
+      var scaler = 0.2;
+      mat4.scale(mvMatrix,mvMatrix, [scaler, -scaler, scaler]);
+      // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
+      // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+      // mat4.rotateZ(mvMatrix,mvMatrix,modelYRotationRadians);
+      mat4.rotateX(mvMatrix, mvMatrix, degToRad(-10));
+      // mat4.rotateY(mvMatrix, mvMatrix, degToRad(90));
+      mat4.rotateZ(mvMatrix, mvMatrix, degToRad(-10));
+      // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
+      
+      uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
+      // uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
+  
+      uploadNormalMatrixToShader(); 
+      setMatrixUniforms();  
+      if(isLoaded) {
+        drawTeapot();
+      }
+      mvPopMatrix();
+    
     // draw skybox
     setupShaders("shader-vs", "shader-fs");
     mvPushMatrix();
-    vec3.set(transformVec,0.0,0.0,-5.0);
+    vec3.set(transformVec,0.0,0.0,5.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
     // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
 
     setMatrixUniforms();    
     drawCube();
-    mvPopMatrix();
+    // mvPopMatrix();
 
-    // draw teapot
-    setupShaders("shader-teapot-vs", "shader-teapot-fs");
-    mvPushMatrix();
-    // mat4.identity(mvMatrix);
-    vec3.set(transformVec,2.0,1.0,-3.0);
-    mat4.translate(mvMatrix, mvMatrix,transformVec);
 
-    var scaler = -0.5;
-    mat4.scale(mvMatrix,mvMatrix, [scaler, scaler, scaler]);
-    // mat4.rotateX(mvMatrix,mvMatrix,modelXRotationRadians);
-    // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
-    // mat4.rotateZ(mvMatrix,mvMatrix,modelYRotationRadians);
-    // mat4.rotateX(mvMatrix, mvMatrix, degToRad(90));
-    // mat4.rotateY(mvMatrix, mvMatrix, degToRad(90));
-    // mat4.rotateZ(mvMatrix, mvMatrix, degToRad(90));
-    // mat4.rotateY(mvMatrix,mvMatrix,modelYRotationRadians);
-    
-    uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
-    // uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
-
-    uploadNormalMatrixToShader(); 
-    setMatrixUniforms();  
-    if(isLoaded) {
-      drawTeapot();
-    }
     
     mvPopMatrix();
 }
