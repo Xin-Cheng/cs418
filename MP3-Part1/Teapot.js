@@ -1,3 +1,7 @@
+/**
+ * @author Xin Cheng <xcheng11@illinois.edu>
+ * Code adapted from https://courses.engr.illinois.edu/cs418/fa2017/
+ */
 
 var gl;
 var canvas;
@@ -228,13 +232,11 @@ function setupShaders(vshader,fshader) {
   }
 
   gl.useProgram(shaderProgram);
-    shaderProgram.texCoordAttribute = gl.getAttribLocation(shaderProgram, "aTexCoord");
-    // console.log("Tex coord attrib: ", shaderProgram.texCoordAttribute);
-    gl.enableVertexAttribArray(shaderProgram.texCoordAttribute);
-    shaderProgram.uniformFace = gl.getUniformLocation(shaderProgram, "uFace");
-  
+  shaderProgram.texCoordAttribute = gl.getAttribLocation(shaderProgram, "aTexCoord");
+  gl.enableVertexAttribArray(shaderProgram.texCoordAttribute);
+  shaderProgram.uniformFace = gl.getUniformLocation(shaderProgram, "uFace");
+
   shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-  // console.log("Vertex attrib: ", shaderProgram.vertexPositionAttribute);
   gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
   shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
@@ -248,17 +250,6 @@ function setupShaders(vshader,fshader) {
     shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
     shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
 
-    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler0"), 0);  
-    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler1"), 1);
-    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler2"), 2);
-    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler3"), 3);
-    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler4"), 4);
-    // gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler5"), 0);
-    // shaderProgram.uniformDiffuseMaterialColor = gl.getUniformLocation(shaderProgram, "uDiffuseMaterialColor");
-    // shaderProgram.uniformAmbientMaterialColor = gl.getUniformLocation(shaderProgram, "uAmbientMaterialColor");
-    // shaderProgram.uniformSpecularMaterialColor = gl.getUniformLocation(shaderProgram, "uSpecularMaterialColor");
-  
-    // shaderProgram.uniformShininess = gl.getUniformLocation(shaderProgram, "uShininess");   
     shaderProgram.uSampler0 = gl.getUniformLocation(shaderProgram, "uSampler0");
     shaderProgram.uSampler1 = gl.getUniformLocation(shaderProgram, "uSampler1");
     shaderProgram.uSampler2 = gl.getUniformLocation(shaderProgram, "uSampler2");
@@ -337,6 +328,9 @@ function drawCube(){
   gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 30*size);
 }
 
+/**
+ * Upload image texture to shader
+ */
 function uploadTextureToShader() {
   gl.activeTexture(gl.TEXTURE5);
   gl.bindTexture(gl.TEXTURE_2D, frontTexture);
@@ -363,6 +357,7 @@ function uploadTextureToShader() {
   gl.uniform1f(shaderProgram.uniformFace, 5.0);
 
 }
+
 /**
  * Draws a teapot from the teapot buffer
  */
@@ -387,7 +382,6 @@ function drawTeapot() {
 var xdir = 0;
 var ydir = 0;
 var zdir = 0;
-
 function orbit(value, id) {
   if(id == "xrange")
     xdir += value;
@@ -396,6 +390,7 @@ function orbit(value, id) {
   if(id == "zrange")
     zdir += value;
 }
+
 /**
  * Draw call that applies matrix transformations to cube
  */
@@ -418,38 +413,35 @@ function draw() {
     //console.log(vec4.str(lightPosEye4))
     var lightPosEye = vec3.fromValues(lightPosEye4[0],lightPosEye4[1],lightPosEye4[2]);
 
-      // draw teapot
-      setupShaders("shader-teapot-vs", "shader-teapot-fs");
-      mvPushMatrix();
+    // draw teapot
+    setupShaders("shader-teapot-vs", "shader-teapot-fs");
+    mvPushMatrix();
 
-      // mat4.identity(mvMatrix);
-      vec3.set(transformVec,0.15,0.0,4.2);
-      
-      mat4.translate(mvMatrix, mvMatrix,transformVec);
+    vec3.set(transformVec,0.15,0.0,4.2);
+    mat4.translate(mvMatrix, mvMatrix,transformVec);
 
-      var scaler = 0.1;
-      mat4.scale(mvMatrix,mvMatrix, [scaler, -scaler, scaler]);
+    var scaler = 0.1;
+    mat4.scale(mvMatrix,mvMatrix, [-scaler, scaler, scaler]);
 
-      mat4.rotateX(mvMatrix,mvMatrix,degToRad(xdir));
-      mat4.rotateY(mvMatrix,mvMatrix,degToRad(ydir));
-      mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
+    mat4.rotateX(mvMatrix,mvMatrix,degToRad(xdir));
+    mat4.rotateY(mvMatrix,mvMatrix,degToRad(ydir));
+    mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
 
-      uploadLightsToShader(lightPosEye,[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
-      uploadTextureToShader();
-      
-      uploadNormalMatrixToShader(); 
-      setMatrixUniforms();  
-      if(isLoaded) {
-        drawTeapot();
-      }
-      mvPopMatrix();
+    uploadLightsToShader(lightPosEye,[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
+    uploadTextureToShader();
+    
+    uploadNormalMatrixToShader(); 
+    setMatrixUniforms();  
+    if(isLoaded) {
+      drawTeapot();
+    }
+    mvPopMatrix();
     
     // draw skybox
     setupShaders("shader-vs", "shader-fs");
     mvPushMatrix();
     vec3.set(transformVec,0.0,0.0,5.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-
     setMatrixUniforms();    
     drawCube();
     mvPopMatrix();
@@ -504,6 +496,9 @@ function setupTextures() {
   fillTexture(leftImage, leftTexture, "images/neg-x.png");
 }
 
+/**
+ * Fill texture with image data.
+ */
 function fillTexture(image, texture, src) {
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -551,7 +546,7 @@ function handleTextureLoaded(image, texture) {
  * Sets up buffers for teapot.
  */
 /**
- * Populate buffers with data
+ * Populate buffers with data from obj file.
  */
 var teapotVertices = [];
 var teapotFaces = [];
@@ -566,6 +561,7 @@ function parseObjData(teapotData) {
     var linValue = dataArray[i].split(' '); 
     var value;
     if (linValue[0] == "v") {
+      // vertex data
       vertexNumber++;
       value = linValue.slice(1, 4)
       for(var j = 0; j < 3; j++) {value[j] = parseFloat(value[j]);}
@@ -573,8 +569,8 @@ function parseObjData(teapotData) {
       teapotNormals.push(0);
       teapotNormals.push(0);
       teapotNormals.push(0);
-      // console.log(value.toString());
     } else if(linValue[0] == "f") {
+      // face data
       faceNumer++;
       value = linValue.slice(2, 5)
       for(var j = 0; j < 3; j++) {value[j] = parseInt(value[j])-1;}
@@ -584,9 +580,6 @@ function parseObjData(teapotData) {
   isLoaded = true;
   computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
   setupTeapotBuffers();
-  console.log(faceNumer);
-  // console.log(teapotFaces.toString());
-
 }
 
 /**
