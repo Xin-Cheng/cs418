@@ -433,12 +433,14 @@ function draw() {
     mat4.rotateY(mvMatrix,mvMatrix,ydir);
     // mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
 
-    uploadLightsToShader(lightPosEye,[1.0,1.0,1.0],[0.79,0.88,1.0],[1.0,1.0,1.0]);
+    uploadLightsToShader(lightPosEye,[0.83,0.69,0.22],[0.79,0.88,1.0],[1.0,1.0,1.0]);
     uploadTextureToShader();
     
     uploadNormalMatrixToShader(); 
     setMatrixUniforms();  
     if(isLoaded) {
+      computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
+      setupTeapotBuffers();
       drawTeapot();
     }
     mvPopMatrix();
@@ -584,8 +586,6 @@ function parseObjData(teapotData) {
     }
   }
   isLoaded = true;
-  computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
-  setupTeapotBuffers();
 }
 
 /**
