@@ -117,12 +117,42 @@
           
       vec4 vColor = vec4(0.75,0.75,0.75, 0.0);
 
-      if(uUseReflection) {
-        vColor = vec4(1.0,0.0,0.0, 0.0);
-      }
       float face = 0.0;
       vec2 textureCoordinate = vec2(0.0, 0.0);
-      
+      if(uUseReflection) {
+        // Calculate texture coordinates
+        if(abs(R[0]) > abs(R[1]) && abs(R[0]) > abs(R[2])) {
+          face = R[0];
+          textureCoordinate.s = 0.5 + 0.5*R[1];
+          textureCoordinate.t = -(0.5 + 0.5*R[2]);
+  
+          if(face > 0.0) {
+            vColor = texture2D(uSampler4, textureCoordinate);
+          } else {
+            vColor = texture2D(uSampler5, textureCoordinate);
+          }
+        } else if(abs(R[1]) > abs(R[0]) && abs(R[1]) > abs(R[2])) {
+          face = R[1];
+          textureCoordinate.s= 0.5 + 0.5*R[0];
+          textureCoordinate.t = -(0.5 + 0.5*R[2]);
+  
+          if(face > 0.0) {
+            vColor = texture2D(uSampler3, textureCoordinate);
+          } else {
+            vColor = texture2D(uSampler2, textureCoordinate);
+          }
+        } else{
+          face = R[2];
+          textureCoordinate.s = 0.5 + 0.5*R[0];
+          textureCoordinate.t = -(0.5 + 0.5*R[1]);
+  
+          if(face > 0.0) {
+            vColor = texture2D(uSampler0, textureCoordinate);
+          } else {
+            vColor = texture2D(uSampler1, textureCoordinate);
+          }
+        }
+      }      
 
       // Calculate the vector (l) to the light source
       vec3 vectorToLightSource = normalize(uLightPosition - vPosition);

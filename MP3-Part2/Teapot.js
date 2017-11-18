@@ -436,7 +436,7 @@ function draw() {
     // mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
 
     // uploadLightsToShader(lightPosEye,[0.83,0.69,0.22],[0.79,0.88,1.0],[1.0,1.0,1.0]);
-    uploadLightsToShader(lightPosEye,[0.83,0.69,0.22],[0.2,0.2,0.2],[1.0,1.0,1.0]);
+    uploadLightsToShader(lightPosEye,[0.75,0.75,0.75],[0.2,0.2,0.2],[1.0,1.0,1.0]);
     uploadTextureToShader();
     uploadNormalMatrixToShader(); 
     setMatrixUniforms();  
