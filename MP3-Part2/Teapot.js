@@ -256,6 +256,8 @@ function setupShaders(vshader,fshader) {
     shaderProgram.uSampler3 = gl.getUniformLocation(shaderProgram, "uSampler3");
     shaderProgram.uSampler4 = gl.getUniformLocation(shaderProgram, "uSampler4");
     shaderProgram.uSampler5 = gl.getUniformLocation(shaderProgram, "uSampler5");
+
+    shaderProgram.uniformUseReflection = gl.getUniformLocation(shaderProgram, "uUseReflection");  
   }  
 }
 
@@ -414,7 +416,7 @@ function draw() {
     // Then generate the lookat matrix and initialize the MV matrix to that view
     mat4.lookAt(mvMatrix,eyePt,viewPt,up);  
 
-    var lightPosEye4 = vec4.fromValues(1.0,1.0,1.0,1.0);
+    var lightPosEye4 = vec4.fromValues(10.0,10.0,10.0,1.0);
     lightPosEye4 = vec4.transformMat4(lightPosEye4,lightPosEye4,mvMatrix);
     //console.log(vec4.str(lightPosEye4))
     var lightPosEye = vec3.fromValues(lightPosEye4[0],lightPosEye4[1],lightPosEye4[2]);
@@ -433,14 +435,18 @@ function draw() {
     mat4.rotateY(mvMatrix,mvMatrix,ydir);
     // mat4.rotateZ(mvMatrix,mvMatrix,degToRad(zdir));
 
-    uploadLightsToShader(lightPosEye,[0.83,0.69,0.22],[0.79,0.88,1.0],[1.0,1.0,1.0]);
+    // uploadLightsToShader(lightPosEye,[0.83,0.69,0.22],[0.79,0.88,1.0],[1.0,1.0,1.0]);
+    uploadLightsToShader(lightPosEye,[0.83,0.69,0.22],[0.2,0.2,0.2],[1.0,1.0,1.0]);
     uploadTextureToShader();
-    
     uploadNormalMatrixToShader(); 
     setMatrixUniforms();  
     if(isLoaded) {
       computePerVertexNormal(teapotVertices, teapotFaces, teapotNormals);
       setupTeapotBuffers();
+      if(document.getElementById("mirror").checked == true)
+        gl.uniform1f(shaderProgram.uniformUseReflection, true);
+      else
+        gl.uniform1f(shaderProgram.uniformUseReflection, false);
       drawTeapot();
     }
     mvPopMatrix();
@@ -657,7 +663,6 @@ function setupTeapotBuffers() {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotNormals), gl.STATIC_DRAW);
   teapotNormalBuffer.itemSize = 3;
   teapotNormalBuffer.numItems = vertexNumber;
-  console.log('cdd');
 }
 /**
  * Sets up buffers for cube and Populate buffers with data
