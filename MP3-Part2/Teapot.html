@@ -84,8 +84,8 @@
     gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
 
 
-    vec4 eyePos = uMVMatrix*vec4(vPosition, 1.0);
-    vec4 N = uMVMatrix*vec4(vNormal, 1.0);
+    vec4 eyePos = vec4(vPosition, 1.0);
+    vec4 N = vec4(vNormal, 1.0);
     R = normalize(reflect(eyePos.xyz, N.xyz));
   }
 </script>
