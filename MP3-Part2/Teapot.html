@@ -103,15 +103,9 @@
   uniform vec3 uSpecularLightColor;
   uniform bool uUseReflection;
 
+  uniform samplerCube texMap;  
+
   const float shininess = 20.0;
-  
-  // The texture.
-  uniform sampler2D uSampler0; // front
-  uniform sampler2D uSampler1; // back
-  uniform sampler2D uSampler2; // top
-  uniform sampler2D uSampler3; // bottom
-  uniform sampler2D uSampler4; // right
-  uniform sampler2D uSampler5; // left
   
   void main(void) {
           
@@ -120,38 +114,8 @@
       float face = 0.0;
       vec2 textureCoordinate = vec2(0.0, 0.0);
       if(uUseReflection) {
-        // Calculate texture coordinates
-        if(abs(R[0]) > abs(R[1]) && abs(R[0]) > abs(R[2])) {
-          face = R[0];
-          textureCoordinate.s = 0.5 + 0.5*R[1];
-          textureCoordinate.t = -(0.5 + 0.5*R[2]);
-  
-          if(face > 0.0) {
-            vColor = texture2D(uSampler4, textureCoordinate);
-          } else {
-            vColor = texture2D(uSampler5, textureCoordinate);
-          }
-        } else if(abs(R[1]) > abs(R[0]) && abs(R[1]) > abs(R[2])) {
-          face = R[1];
-          textureCoordinate.s= 0.5 + 0.5*R[0];
-          textureCoordinate.t = -(0.5 + 0.5*R[2]);
-  
-          if(face > 0.0) {
-            vColor = texture2D(uSampler3, textureCoordinate);
-          } else {
-            vColor = texture2D(uSampler2, textureCoordinate);
-          }
-        } else{
-          face = R[2];
-          textureCoordinate.s = 0.5 + 0.5*R[0];
-          textureCoordinate.t = -(0.5 + 0.5*R[1]);
-  
-          if(face > 0.0) {
-            vColor = texture2D(uSampler0, textureCoordinate);
-          } else {
-            vColor = texture2D(uSampler1, textureCoordinate);
-          }
-        }
+        // User reflection checked
+        vColor = vec4(1.0,1.0,0.0, 0.0);
       }      
 
       // Calculate the vector (l) to the light source

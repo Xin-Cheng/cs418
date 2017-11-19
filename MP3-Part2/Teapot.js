@@ -258,6 +258,8 @@ function setupShaders(vshader,fshader) {
     shaderProgram.uSampler5 = gl.getUniformLocation(shaderProgram, "uSampler5");
 
     shaderProgram.uniformUseReflection = gl.getUniformLocation(shaderProgram, "uUseReflection");  
+
+    shaderProgram.texMap = gl.getUniformLocation(shaderProgram, "texMap");
   }  
 }
 
