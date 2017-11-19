@@ -48,6 +48,8 @@ var bottomTexture;
 var rightTexture;
 var leftTexture;
 
+var teapotTexture;
+
 // View parameters
 var eyePt = vec3.fromValues(0.0,0.0,5.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
@@ -367,6 +369,7 @@ function uploadTextureToShader() {
  */
 function drawTeapot() {
   gl.polygonOffset(0,0);
+
   // Bind vertex buffer
   gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, teapotVertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -375,6 +378,10 @@ function drawTeapot() {
   gl.bindBuffer(gl.ARRAY_BUFFER, teapotNormalBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, teapotNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);   
      
+  
+  gl.activeTexture( gl.TEXTURE0 );
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, teapotTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "texMap"),0);
   //Draw 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotTriIndexBuffer);
   gl.drawElements(gl.TRIANGLES, teapotTriIndexBuffer.numItems, gl.UNSIGNED_SHORT,0);  
@@ -439,7 +446,7 @@ function draw() {
 
     // uploadLightsToShader(lightPosEye,[0.83,0.69,0.22],[0.79,0.88,1.0],[1.0,1.0,1.0]);
     uploadLightsToShader(lightPosEye,[0.75,0.75,0.75],[0.2,0.2,0.2],[1.0,1.0,1.0]);
-    uploadTextureToShader();
+    // uploadTextureToShader();
     uploadNormalMatrixToShader(); 
     setMatrixUniforms();  
     if(isLoaded) {
@@ -449,6 +456,7 @@ function draw() {
         gl.uniform1f(shaderProgram.uniformUseReflection, true);
       else
         gl.uniform1f(shaderProgram.uniformUseReflection, false);
+      
       drawTeapot();
     }
     mvPopMatrix();
@@ -510,6 +518,30 @@ function setupTextures() {
   fillTexture(bottomImage, bottomTexture, "images/neg-y.png");
   fillTexture(rightImage, rightTexture, "images/pos-x.png");
   fillTexture(leftImage, leftTexture, "images/neg-x.png");
+
+  teapotTexture = gl.createTexture();
+  var boxFaces = [
+    [rightImage, gl.TEXTURE_CUBE_MAP_POSITIVE_X],
+    [leftImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
+    [topImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
+    [bottomImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
+    [frontImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
+    [backImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
+  ];
+
+  fillTeatpotTexture(teapotTexture, boxFaces);
+}
+
+function fillTeatpotTexture(teapotTexture, boxFaces) {
+  for(var i = 0; i < boxFaces.length; i++) {
+    var image = boxFaces[i][0];
+    var face = boxFaces[i][1];
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, teapotTexture);
+    gl.texImage2D(face, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+  }
 }
 
 /**

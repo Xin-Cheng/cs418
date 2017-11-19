@@ -86,7 +86,7 @@
 
     vec4 eyePos = uMVMatrix*vec4(vPosition, 1.0);
     vec4 N = uMVMatrix*vec4(vNormal, 1.0);
-    R = -normalize(reflect(-eyePos.xyz, N.xyz));
+    R = normalize(reflect(eyePos.xyz, N.xyz));
   }
 </script>
  
@@ -115,7 +115,7 @@
       vec2 textureCoordinate = vec2(0.0, 0.0);
       if(uUseReflection) {
         // User reflection checked
-        vColor = vec4(1.0,1.0,0.0, 0.0);
+        vColor = textureCube(texMap, R);
       }      
 
       // Calculate the vector (l) to the light source
