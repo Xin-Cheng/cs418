@@ -391,7 +391,7 @@ function drawTeapot() {
 /**
  *  An event listener for the keydown event.  It is installed by the init() function.  Rotates the reflective object.
  */
-var xdir = 0;
+var xdir = 0.45;
 var ydir = 0;
 
 function orbit(evt) {
@@ -434,7 +434,7 @@ function draw() {
     setupShaders("shader-teapot-vs", "shader-teapot-fs");
     mvPushMatrix();
 
-    vec3.set(transformVec,0.15,0.0,4.5);
+    vec3.set(transformVec,0.15,0.0,4.35);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
 
     var scaler = 0.1;
@@ -765,35 +765,35 @@ function setupBuffers() {
 
   var textureCoordinates = [
     // Front
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
     0.0,  1.0,
+    1.0,  1.0,
+    1.0,  0.0,
+    0.0,  0.0,
     // Back
-    1.0,  0.0,
     1.0,  1.0,
-    0.0,  1.0,    
+    1.0,  0.0,
     0.0,  0.0,
+    0.0,  1.0,       
     // Top
-    0.0,  1.0,
     0.0,  0.0,
-    1.0,  0.0,
+    0.0,  1.0,
     1.0,  1.0,
+    1.0,  0.0,   
     // Bottom
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
     0.0,  1.0,
+    1.0,  1.0,
+    1.0,  0.0,
+    0.0,  0.0,
     // Right
-    1.0,  0.0,
     1.0,  1.0,
-    0.0,  1.0,
+    1.0,  0.0,
     0.0,  0.0,
+    0.0,  1.0,  
     // Left
-    0.0,  0.0,
-    1.0,  0.0,
+    0.0,  1.0,
     1.0,  1.0,
-    0.0,  1.0
+    1.0,  0.0,
+    0.0,  0.0,
   ];
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
