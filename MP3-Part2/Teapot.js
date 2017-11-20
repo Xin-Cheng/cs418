@@ -434,7 +434,7 @@ function draw() {
     setupShaders("shader-teapot-vs", "shader-teapot-fs");
     mvPushMatrix();
 
-    vec3.set(transformVec,0.15,0.0,4.2);
+    vec3.set(transformVec,0.15,0.0,4.5);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
 
     var scaler = 0.1;
@@ -518,15 +518,19 @@ function setupTextures() {
   fillTexture(bottomImage, bottomTexture, "images/neg-y.png");
   fillTexture(rightImage, rightTexture, "images/pos-x.png");
   fillTexture(leftImage, leftTexture, "images/neg-x.png");
-
+}
+/**
+ * Creates texture for application to teapot.
+ */
+function setupTeapotTexture() {
   teapotTexture = gl.createTexture();
   var boxFaces = [
-    [rightImage, gl.TEXTURE_CUBE_MAP_POSITIVE_X],
-    [leftImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
-    [topImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
-    [bottomImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
-    [frontImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
-    [backImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
+    ["images/pos-x.png", gl.TEXTURE_CUBE_MAP_POSITIVE_X],
+    ["images/neg-x.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
+    ["images/pos-y.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
+    ["images/neg-y.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
+    ["images/pos-z.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
+    ["images/neg-z.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
   ];
 
   fillTeatpotTexture(teapotTexture, boxFaces);
@@ -534,22 +538,25 @@ function setupTextures() {
 
 function fillTeatpotTexture(teapotTexture, boxFaces) {
   for(var i = 0; i < boxFaces.length; i++) {
-    var image = boxFaces[i][0];
+    var image = new Image();
+    image.src = boxFaces[i][0];
     var face = boxFaces[i][1];
+    
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, teapotTexture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.texImage2D(face, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
   }
 }
-
 /**
  * Fill texture with image data.
  */
 function fillTexture(image, texture, src) {
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  
   gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   // Fill the texture with a 1x1 blue pixel.
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
               new Uint8Array([0, 0, 255, 255]));
@@ -828,6 +835,7 @@ function setupBuffers() {
   gl.enable(gl.DEPTH_TEST);
   setupBuffers();
   setupTextures();
+  setupTeapotTexture();
   readTextFile("teapot_0.obj", parseObjData);  
   document.addEventListener("keydown", orbit, false);
   tick();
