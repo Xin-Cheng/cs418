@@ -384,6 +384,7 @@ function drawTeapot() {
   gl.uniform1i(gl.getUniformLocation(shaderProgram, "texMap"),0);
   //Draw 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotTriIndexBuffer);
+  setMatrixUniforms();
   gl.drawElements(gl.TRIANGLES, teapotTriIndexBuffer.numItems, gl.UNSIGNED_SHORT,0);  
 }
 
@@ -434,7 +435,7 @@ function draw() {
     setupShaders("shader-teapot-vs", "shader-teapot-fs");
     mvPushMatrix();
 
-    vec3.set(transformVec,0.15,0.0,4.35);
+    vec3.set(transformVec,0.15,-0.1,4.35);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
 
     var scaler = 0.1;
@@ -525,12 +526,12 @@ function setupTextures() {
 function setupTeapotTexture() {
   teapotTexture = gl.createTexture();
   var boxFaces = [
-    ["images/pos-x.png", gl.TEXTURE_CUBE_MAP_POSITIVE_X],
-    ["images/neg-x.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
-    ["images/pos-y.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
-    ["images/neg-y.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
-    ["images/pos-z.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
-    ["images/neg-z.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
+    [rightImage, gl.TEXTURE_CUBE_MAP_POSITIVE_X],
+    [leftImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
+    [topImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
+    [bottomImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
+    [frontImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
+    [backImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
   ];
 
   fillTeatpotTexture(teapotTexture, boxFaces);
@@ -538,8 +539,7 @@ function setupTeapotTexture() {
 
 function fillTeatpotTexture(teapotTexture, boxFaces) {
   for(var i = 0; i < boxFaces.length; i++) {
-    var image = new Image();
-    image.src = boxFaces[i][0];
+    var image = boxFaces[i][0];
     var face = boxFaces[i][1];
     
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, teapotTexture);
@@ -675,7 +675,6 @@ function computePerVertexNormal(vertexArray, faceArray, normalArray)
         normalArray[i+1] = normal[1];
         normalArray[i+2] = normal[2];
     }
-    console.log(normalArray.length);
 }
 
 /**
@@ -835,8 +834,8 @@ function setupBuffers() {
   gl.enable(gl.DEPTH_TEST);
   setupBuffers();
   setupTextures();
-  setupTeapotTexture();
   readTextFile("teapot_0.obj", parseObjData);  
+  setupTeapotTexture();
   document.addEventListener("keydown", orbit, false);
   tick();
 }

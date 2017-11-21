@@ -3,10 +3,65 @@
 <head>
 <title>Teatpot </title>
 <meta charset="utf-8"> 
+<link rel="stylesheet" href="styles.css">
 <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css' rel='stylesheet'>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 </head>
 
+<script src="library/gl-matrix-min.js"></script> 
+<script src="library/webgl-utils.js"></script>   
+<script src="Teapot.js"></script> 
+<script src="readText.js"></script> 
+<body onload="startup();">
+<h1>MP3-Part1 Texture</h1>
+</body>
+<body onload="startup();">
+    <table>
+        <tr>
+            <td><canvas id="myGLCanvas" width="800" height="800"></canvas></td>
+            <td>
+              <table>
+                <tr>
+                  <td  style="padding-left: 1cm;">
+                      <input id="mirror" type="checkbox" checked> Mirror
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-left: 1cm;">
+                    <h3>Mirror switch:</h3> 
+                    <label class="switch">
+                        <input type="checkbox" id="fogChecked" checked>
+                        <div class="slider round">
+                            <span class="on">ON</span>
+                            <span class="off">OFF</span>
+                        </div>
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                      <fieldset style="padding-left: 1cm;">
+                          <legend><h3>Instruction to rotate the teapot:</h3></legend>
+                          <table>
+      
+                              <tr><td><i class="fa fa-arrow-left" aria-hidden="true"></i></td><td>Roll Left</td></tr>
+                              <tr><td></td><td>Press left arrow to roll left</td></tr>
+                              <tr><td><i class="fa fa-arrow-right" aria-hidden="true"></i></td><td>Roll Right</td></tr>
+                              <tr><td></td><td>Press right arrow to roll right</td></tr>
+                              <tr><td><i class="fa fa-arrow-up" aria-hidden="true"></i></td><td>Roll Up</td></tr>
+                              <tr><td></td><td>Press up arrow to role up</td></tr>
+                              <tr><td><i class="fa fa-arrow-down" aria-hidden="true"></i></td><td>Roll Down</td></tr>
+                              <tr><td></td><td>Press down arrow to roll down</td></tr>
+                          </table>
+                      </fieldset>
+                  </td>
+                </tr>
+              </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
     
 <script id="shader-vs" type="x-shader/x-vertex">
   // vertext shader for skybox
@@ -142,45 +197,4 @@
 </script>
 </script>
 
-<script src="library/gl-matrix-min.js"></script> 
-<script src="library/webgl-utils.js"></script>   
-<script src="Teapot.js"></script> 
-<script src="readText.js"></script> 
-<body onload="startup();">
-<h1>MP3-Part1 Texture</h1>
-</body>
-<body onload="startup();">
-    <table>
-        <tr>
-            <td><canvas id="myGLCanvas" width="800" height="800"></canvas></td>
-            <td>
-              <table>
-                <tr>
-                  <td  style="padding-left: 1cm;">
-                      <input id="mirror" type="checkbox"> Mirror
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                      <fieldset style="padding-left: 1cm;">
-                          <legend><h3>Instruction to rotate the teapot:</h3></legend>
-                          <table>
-      
-                              <tr><td><i class="fa fa-arrow-left" aria-hidden="true"></i></td><td>Roll Left</td></tr>
-                              <tr><td></td><td>Press left arrow to roll left</td></tr>
-                              <tr><td><i class="fa fa-arrow-right" aria-hidden="true"></i></td><td>Roll Right</td></tr>
-                              <tr><td></td><td>Press right arrow to roll right</td></tr>
-                              <tr><td><i class="fa fa-arrow-up" aria-hidden="true"></i></td><td>Roll Up</td></tr>
-                              <tr><td></td><td>Press up arrow to role up</td></tr>
-                              <tr><td><i class="fa fa-arrow-down" aria-hidden="true"></i></td><td>Roll Down</td></tr>
-                              <tr><td></td><td>Press down arrow to roll down</td></tr>
-                          </table>
-                      </fieldset>
-                  </td>
-                </tr>
-              </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+
