@@ -584,7 +584,7 @@ function fillTeatpotTexture(teapotTexture, boxFaces) {
 }
 
 /**
- * Fill texture with image data.
+ * Fill cube texture with image data.
  */
 function fillTexture(image, texture, src) {
   

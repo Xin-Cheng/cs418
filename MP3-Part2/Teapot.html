@@ -12,6 +12,7 @@
 <script src="library/webgl-utils.js"></script>   
 <script src="Teapot.js"></script> 
 <script src="readText.js"></script> 
+<h1>MP3 Environment Mapping</h1>
 <body onload="startup();">
     <table>
         <tr>
@@ -19,15 +20,10 @@
             <td>
               <table>
                 <tr>
-                  <td  style="padding-left: 1cm;">
-                      <input id="mirror" type="checkbox" checked> Mirror
-                  </td>
-                </tr>
-                <tr>
                   <td style="padding-left: 1cm;">
                     <h3>Mirror switch:</h3> 
                     <label class="switch">
-                        <input type="checkbox" id="fogChecked" checked>
+                        <input type="checkbox" id="mirror" checked>
                         <div class="slider round">
                             <span class="on">ON</span>
                             <span class="off">OFF</span>
@@ -164,7 +160,7 @@
           float face = 0.0;
           vec2 textureCoordinate = vec2(0.0, 0.0);
           if(uUseReflection) {
-            // User reflection checked
+            // User reflection checked, use cubemap to render teapot
             vColor = textureCube(texMap, R);
           }      
     
