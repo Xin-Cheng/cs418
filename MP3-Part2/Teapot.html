@@ -13,9 +13,6 @@
 <script src="Teapot.js"></script> 
 <script src="readText.js"></script> 
 <body onload="startup();">
-<h1>MP3-Part1 Texture</h1>
-</body>
-<body onload="startup();">
     <table>
         <tr>
             <td><canvas id="myGLCanvas" width="800" height="800"></canvas></td>
@@ -60,141 +57,139 @@
             </td>
         </tr>
     </table>
+
+    <script id="shader-vs" type="x-shader/x-vertex">
+      // vertext shader for skybox
+      attribute vec3 aVertexNormal;
+      attribute vec3 aVertexPosition;
+      attribute vec2 aTexCoord;
+      
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      
+      varying vec2 vTexCoord;
+    
+      void main(void) {     
+        gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+        vTexCoord=aTexCoord;    
+      }
+    </script>
+      
+    <script id="shader-fs" type="x-shader/x-fragment">
+      // Fragment shader of skybox
+      precision mediump float;
+      
+      // Passed in from the vertex shader.
+      varying vec2 vTexCoord;
+    
+      // The texture.
+      uniform sampler2D uSampler0;
+      uniform sampler2D uSampler1;
+      uniform sampler2D uSampler2;
+      uniform sampler2D uSampler3;
+      uniform sampler2D uSampler4;
+      uniform sampler2D uSampler5;
+    
+      uniform float uFace;
+      
+      void main() {
+        vec4 color0 = texture2D(uSampler0, vTexCoord);
+        vec4 color1 = texture2D(uSampler1, vTexCoord);
+        vec4 color2 = texture2D(uSampler2, vTexCoord);
+        vec4 color3 = texture2D(uSampler3, vTexCoord);
+        vec4 color4 = texture2D(uSampler4, vTexCoord);
+        vec4 color5 = texture2D(uSampler5, vTexCoord);   
+    
+        if(uFace == 0.0) {gl_FragColor = color0;}
+        else if(uFace == 1.0 ) {gl_FragColor = color1;}
+        else if(uFace == 2.0 ) {gl_FragColor = color2;}
+        else if(uFace == 3.0 ) {gl_FragColor = color3;}
+        else if(uFace == 4.0 ) {gl_FragColor = color4;}
+        else {gl_FragColor = color5;}
+      }
+    </script>
+    
+    <script id="shader-teapot-vs" type="x-shader/x-vertex">
+      // Teapot vertex shader
+      attribute vec3 aVertexNormal;
+      attribute vec3 aVertexPosition;
+      varying vec3 R;
+      
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      uniform mat3 uNMatrix;
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+      varying vec3 position;
+      
+      
+      void main(void) {
+        // Get the vertex position in eye coordinates
+        vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
+        vPosition = vertexPositionEye4.xyz / vertexPositionEye4.w;
+        position = vec3(aVertexPosition);
+        //Calaulate the normal
+        vNormal = normalize(uNMatrix * aVertexNormal);
+        
+        gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+    
+    
+        vec4 eyePos = vec4(vPosition, 1.0);
+        vec4 N = vec4(vNormal, 1.0);
+        R = normalize(reflect(eyePos.xyz, N.xyz));
+      }
+    </script>
+     
+    <script id="shader-teapot-fs" type="x-shader/x-fragment">
+      // Teapot fragment shader
+      precision mediump float;
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+      varying vec3 R;
+    
+      uniform vec3 uLightPosition;
+      uniform vec3 uAmbientLightColor;
+      uniform vec3 uDiffuseLightColor;
+      uniform vec3 uSpecularLightColor;
+      uniform bool uUseReflection;
+    
+      uniform samplerCube texMap;  
+    
+      const float shininess = 20.0;
+      
+      void main(void) {
+              
+          vec4 vColor = vec4(0.75,0.75,0.75, 0.0);
+    
+          float face = 0.0;
+          vec2 textureCoordinate = vec2(0.0, 0.0);
+          if(uUseReflection) {
+            // User reflection checked
+            vColor = textureCube(texMap, R);
+          }      
+    
+          // Calculate the vector (l) to the light source
+          vec3 vectorToLightSource = normalize(uLightPosition - vPosition);
+          
+          // Calculate n dot l for diffuse lighting
+          float diffuseLightWeightning = max(dot(vNormal, vectorToLightSource), 0.0);
+         
+          // The camera in eye coordinates is located in the origin and is pointing
+          // along the negative z-axis. Calculate viewVector (v) 
+          // in eye coordinates as:
+          // (0.0, 0.0, 0.0) - vertexPositionEye3
+          vec3 viewVectorEye = -normalize(vPosition);
+    
+          // Calculate the half way vector
+          vec3 halfwayVector = normalize(vectorToLightSource + viewVectorEye);
+          
+          float ndoth = max(dot(vNormal, halfwayVector), 0.0);
+    
+          float specularLightWeightning = pow(ndoth, shininess);
+          
+          gl_FragColor = vec4(((uAmbientLightColor*vColor.xyz)+(uDiffuseLightColor*vColor.xyz) * diffuseLightWeightning+(uSpecularLightColor*vColor.xyz) * specularLightWeightning),1.0);; 
+       }
+    </script>
 </body>
 </html>
     
-<script id="shader-vs" type="x-shader/x-vertex">
-  // vertext shader for skybox
-  attribute vec3 aVertexNormal;
-  attribute vec3 aVertexPosition;
-  attribute vec2 aTexCoord;
-  
-  uniform mat4 uMVMatrix;
-  uniform mat4 uPMatrix;
-  
-  varying vec2 vTexCoord;
-
-  void main(void) {     
-    gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
-    vTexCoord=aTexCoord;    
-  }
-</script>
-  
-<script id="shader-fs" type="x-shader/x-fragment">
-  // Fragment shader of skybox
-  precision mediump float;
-  
-  // Passed in from the vertex shader.
-  varying vec2 vTexCoord;
-
-  // The texture.
-  uniform sampler2D uSampler0;
-  uniform sampler2D uSampler1;
-  uniform sampler2D uSampler2;
-  uniform sampler2D uSampler3;
-  uniform sampler2D uSampler4;
-  uniform sampler2D uSampler5;
-
-  uniform float uFace;
-  
-  void main() {
-    vec4 color0 = texture2D(uSampler0, vTexCoord);
-    vec4 color1 = texture2D(uSampler1, vTexCoord);
-    vec4 color2 = texture2D(uSampler2, vTexCoord);
-    vec4 color3 = texture2D(uSampler3, vTexCoord);
-    vec4 color4 = texture2D(uSampler4, vTexCoord);
-    vec4 color5 = texture2D(uSampler5, vTexCoord);   
-
-    if(uFace == 0.0) {gl_FragColor = color0;}
-    else if(uFace == 1.0 ) {gl_FragColor = color1;}
-    else if(uFace == 2.0 ) {gl_FragColor = color2;}
-    else if(uFace == 3.0 ) {gl_FragColor = color3;}
-    else if(uFace == 4.0 ) {gl_FragColor = color4;}
-    else {gl_FragColor = color5;}
-  }
-</script>
-
-<script id="shader-teapot-vs" type="x-shader/x-vertex">
-  // Teapot vertex shader
-  attribute vec3 aVertexNormal;
-  attribute vec3 aVertexPosition;
-  varying vec3 R;
-  
-  uniform mat4 uMVMatrix;
-  uniform mat4 uPMatrix;
-  uniform mat3 uNMatrix;
-  varying vec3 vNormal;
-  varying vec3 vPosition;
-  varying vec3 position;
-  
-  
-  void main(void) {
-    // Get the vertex position in eye coordinates
-    vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
-    vPosition = vertexPositionEye4.xyz / vertexPositionEye4.w;
-    position = vec3(aVertexPosition);
-    //Calaulate the normal
-    vNormal = normalize(uNMatrix * aVertexNormal);
-    
-    gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
-
-
-    vec4 eyePos = vec4(vPosition, 1.0);
-    vec4 N = vec4(vNormal, 1.0);
-    R = normalize(reflect(eyePos.xyz, N.xyz));
-  }
-</script>
- 
-<script id="shader-teapot-fs" type="x-shader/x-fragment">
-  // Teapot fragment shader
-  precision mediump float;
-  varying vec3 vNormal;
-  varying vec3 vPosition;
-  varying vec3 R;
-
-  uniform vec3 uLightPosition;
-  uniform vec3 uAmbientLightColor;
-  uniform vec3 uDiffuseLightColor;
-  uniform vec3 uSpecularLightColor;
-  uniform bool uUseReflection;
-
-  uniform samplerCube texMap;  
-
-  const float shininess = 20.0;
-  
-  void main(void) {
-          
-      vec4 vColor = vec4(0.75,0.75,0.75, 0.0);
-
-      float face = 0.0;
-      vec2 textureCoordinate = vec2(0.0, 0.0);
-      if(uUseReflection) {
-        // User reflection checked
-        vColor = textureCube(texMap, R);
-      }      
-
-      // Calculate the vector (l) to the light source
-      vec3 vectorToLightSource = normalize(uLightPosition - vPosition);
-      
-      // Calculate n dot l for diffuse lighting
-      float diffuseLightWeightning = max(dot(vNormal, vectorToLightSource), 0.0);
-     
-      // The camera in eye coordinates is located in the origin and is pointing
-      // along the negative z-axis. Calculate viewVector (v) 
-      // in eye coordinates as:
-      // (0.0, 0.0, 0.0) - vertexPositionEye3
-      vec3 viewVectorEye = -normalize(vPosition);
-
-      // Calculate the half way vector
-      vec3 halfwayVector = normalize(vectorToLightSource + viewVectorEye);
-      
-      float ndoth = max(dot(vNormal, halfwayVector), 0.0);
-
-      float specularLightWeightning = pow(ndoth, shininess);
-      
-      gl_FragColor = vec4(((uAmbientLightColor*vColor.xyz)+(uDiffuseLightColor*vColor.xyz) * diffuseLightWeightning+(uSpecularLightColor*vColor.xyz) * specularLightWeightning),1.0);; 
-   }
-</script>
-</script>
-
-

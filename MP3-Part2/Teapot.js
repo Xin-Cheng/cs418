@@ -520,26 +520,58 @@ function setupTextures() {
   fillTexture(rightImage, rightTexture, "images/pos-x.png");
   fillTexture(leftImage, leftTexture, "images/neg-x.png");
 }
+
+/*
+  * Catch image to browser.
+  * cacheImages inspired from:
+  * https://stackoverflow.com/questions/30009528/javascript-image-only-loads-on-refresh
+  */
+function cacheImages(array)
+{
+    if (!cacheImages.list) {
+        cacheImages.list = [];
+    }
+    var list = cacheImages.list;
+    for (var i = 0; i < array.length; i++) {
+        var img = new Image();
+        img.onload = function() {
+            var index = list.indexOf(this);
+            if (index !== -1) {
+                // remove image from the array once it's loaded
+                // for memory consumption reasons
+                list.splice(index, 1);
+            }
+        }
+        list.push(img);
+        img.src = array[i];
+    }
+}
+cacheImages(["images/pos-x.png", "images/neg-x.png", "images/pos-y.png", "images/neg-y.png", "images/pos-z.png", "images/neg-z.png"]);
+
 /**
  * Creates texture for application to teapot.
  */
 function setupTeapotTexture() {
   teapotTexture = gl.createTexture();
   var boxFaces = [
-    [rightImage, gl.TEXTURE_CUBE_MAP_POSITIVE_X],
-    [leftImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
-    [topImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
-    [bottomImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
-    [frontImage, gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
-    [backImage, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
+    ["images/pos-x.png", gl.TEXTURE_CUBE_MAP_POSITIVE_X],
+    ["images/neg-x.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
+    ["images/pos-y.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
+    ["images/neg-y.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
+    ["images/pos-z.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
+    ["images/neg-z.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
   ];
 
   fillTeatpotTexture(teapotTexture, boxFaces);
 }
 
+/**
+ * Fill teapot texture with image data.
+ */
 function fillTeatpotTexture(teapotTexture, boxFaces) {
   for(var i = 0; i < boxFaces.length; i++) {
-    var image = boxFaces[i][0];
+    var image = new Image();
+    image.src = boxFaces[i][0];
     var face = boxFaces[i][1];
     
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, teapotTexture);
@@ -550,6 +582,7 @@ function fillTeatpotTexture(teapotTexture, boxFaces) {
     gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
   }
 }
+
 /**
  * Fill texture with image data.
  */
@@ -563,6 +596,7 @@ function fillTexture(image, texture, src) {
   image.onload = function() { handleTextureLoaded(image, texture); }
   image.src = src;
 }
+
 /**
  * @param {number} value Value to determine whether it is a power of 2
  * @return {boolean} Boolean of whether value is a power of 2
