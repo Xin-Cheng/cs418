@@ -13,6 +13,7 @@
         <script id="shader-vs" type="x-shader/x-vertex">
             attribute vec3 aVertexNormal;
             attribute vec3 aVertexPosition;
+            attribute vec2 aTexCoord;
             
              uniform mat4 uMVMatrix;
              uniform mat4 uPMatrix;
@@ -20,6 +21,8 @@
              varying vec3 vNormal;
              varying vec3 vPosition;
              varying vec3 position;
+
+             varying vec2 vTexCoord;
              
              void main(void) {
                 // Get the vertex position in eye coordinates
@@ -30,6 +33,8 @@
                 vNormal = normalize(uNMatrix * aVertexNormal);
                 
                 gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+
+                vTexCoord=aTexCoord;  
             }
         </script>
 
@@ -39,6 +44,9 @@
             varying vec3 vPosition;
             varying vec3 position;
 
+            // Passed in from the vertex shader.
+            varying vec2 vTexCoord;
+
             uniform vec3 uLightPosition;
             uniform vec3 uAmbientLightColor;
             uniform vec3 uDiffuseLightColor;
@@ -46,8 +54,11 @@
 
             uniform float uFog;
 
+            // The texture.
+            uniform sampler2D uHeightMap;
+            uniform sampler2D uColorMap;
+
             const float shininess = 50.0;
-            
             
             void main(void) {
                     
@@ -95,6 +106,9 @@
                     vColor = vec4(((uAmbientLightColor*blue)+(uDiffuseLightColor*blue) * diffuseLightWeightning+(uSpecularLightColor*blue) * specularLightWeightning),1.0);
                 }
                 
+                //vColor = vec4(((uAmbientLightColor*red)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
+                vec2 cdd = vec2(0.5, 0.5);
+                vColor = texture2D(uColorMap, cdd);
                 // Compute fog
                 float fogCoord = (gl_FragCoord.y/gl_FragCoord.w);
                 vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);            
@@ -115,7 +129,7 @@
 
 </head>
   
-<body onload="startup2();startup();">
+<body onload="startup();">
     <table>
         <tr>
             <td><canvas id="myGLCanvas" width="800" height="800"></canvas></td>

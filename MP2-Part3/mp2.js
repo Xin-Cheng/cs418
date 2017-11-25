@@ -39,14 +39,87 @@ var pMatrix = mat4.create();
 var mvMatrixStack = [];
 
 // Dimenstion of terrain
-var boundaryFar = -2.0;
-var boundaryNear = 3.0;
-var boundaryLeft = -3.0;
-var boundaryRight = 3.0;
+// var boundaryFar = -2.0;
+// var boundaryNear = 3.0;
+// var boundaryLeft = -3.0;
+// var boundaryRight = 3.0;
+var boundaryFar = -1.0;
+var boundaryNear = 1.0;
+var boundaryLeft = -1.0;
+var boundaryRight = 1.0;
 
 // Parameter of flight
 var speed = 0.002;
 var rate = 0.0005;
+
+
+var heightImage;
+var colorImage;
+
+var heightTexture;
+var colorTexture;
+
+/**
+ * Creates texture for application to cube.
+ */
+function setupTextures() {
+  heightImage = new Image();
+  heightTexture = gl.createTexture();
+
+  colorImage = new Image();
+  colorTexture = gl.createTexture();
+
+  fillTexture(heightImage, heightTexture, "images/heightHM.png");
+  fillTexture(colorImage, colorTexture, "images/colorHM.png");
+}
+
+/**
+ * Fill texture with image data.
+ */
+function fillTexture(image, texture, src) {
+  
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  // Fill the texture with a 1x1 blue pixel.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+              new Uint8Array([0, 0, 255, 255]));
+  image.onload = function() { handleTextureLoaded(image, texture); }
+  image.src = src;
+}
+
+/**
+ * @param {number} value Value to determine whether it is a power of 2
+ * @return {boolean} Boolean of whether value is a power of 2
+ */
+function isPowerOf2(value) {
+  return (value & (value - 1)) == 0;
+}
+
+/**
+ * Texture handling. Generates mipmap and sets texture parameters.
+ * @param {Object} image Image for cube application
+ * @param {Object} texture Texture for cube application
+ */
+function handleTextureLoaded(image, texture) {
+  console.log("handleTextureLoaded, image = " + image);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
+  // Check if the image is a power of 2 in both dimensions.
+  if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+     // Yes, it's a power of 2. Generate mips.
+     gl.generateMipmap(gl.TEXTURE_2D);
+     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+     console.log("Loaded power of 2 texture");
+  } else {
+     // No, it's not a power of 2. Turn of mips and set wrapping to clamp to edge
+     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+     console.log("Loaded non-power of 2 texture");
+  }
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+}
+
 //-------------------------------------------------------------------------
 /**
  * Populates terrain buffers for terrain generation
@@ -58,7 +131,7 @@ function setupTerrainBuffers() {
     var nTerrain=[];
     var eTerrain=[];
     // Grid size 2^n by 2^n
-    var gridN=1024;
+    var gridN=512;
 
     // Size of the terrain, terrain out of the screen will be clipped
     var numT = terrainFromIteration(gridN, boundaryLeft,boundaryRight,boundaryFar,boundaryNear, vTerrain, fTerrain, nTerrain);
@@ -99,6 +172,24 @@ function setupTerrainBuffers() {
 /**
  * Draws terrain from populated buffers
  */
+
+/**
+ * Upload textures to shader
+ */
+function uploadTexture() {
+  // Specify the texture to map onto the faces.
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, heightTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uHeightMap"), 0);
+  gl.uniform1f(shaderProgram.uniformFace, 0.0);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, colorTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uColorMap"), 1);
+  gl.uniform1f(shaderProgram.uniformFace, 1.0);
+}
+
+
 function drawTerrain(){
  gl.polygonOffset(0,0);
  gl.bindBuffer(gl.ARRAY_BUFFER, tVertexPositionBuffer);
@@ -109,11 +200,11 @@ function drawTerrain(){
  gl.bindBuffer(gl.ARRAY_BUFFER, tVertexNormalBuffer);
  gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 
                            tVertexNormalBuffer.itemSize,
-                           gl.FLOAT, false, 0, 0);   
+                           gl.FLOAT, false, 0, 0);  
     
- //Draw 
- gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexTriBuffer);
- gl.drawElements(gl.TRIANGLES, tIndexTriBuffer.numItems, gl.UNSIGNED_SHORT,0);      
+  //Draw 
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexTriBuffer);
+  gl.drawElements(gl.TRIANGLES, tIndexTriBuffer.numItems, gl.UNSIGNED_SHORT,0);      
 }
 
 //-------------------------------------------------------------------------
@@ -399,7 +490,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(20), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(40), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // Move forwared
     // if(eyePt[1] > boundaryNear-boundaryFar - 1.5) { eyePt[1] = 0.0; }
@@ -412,11 +503,13 @@ function draw() {
     
     //Draw Terrain
     mvPushMatrix();
-    vec3.set(transformVec,0.0,-0.0,-3.0);
+    vec3.set(transformVec,0.0,-1.0,-3.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-65));
+    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-75));
     mat4.mul(mvMatrix, rotationMatrix, mvMatrix);
     setMatrixUniforms();
+
+    uploadTexture();
 
     fog = document.getElementById("fogChecked").checked ? 1.0 : 0.0; 
     
@@ -457,6 +550,7 @@ function animate() {
   gl = createGLContext(canvas);
   setupShaders();
   setupBuffers();
+  setupTextures();
   gl.clearColor(0.53, 0.81, 0.98, 1.0);
   gl.enable(gl.DEPTH_TEST);
   document.onkeydown = handleKeyDown;

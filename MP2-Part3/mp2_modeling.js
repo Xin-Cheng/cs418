@@ -17,43 +17,24 @@
  * @return {number}
  */
 
-function getHeight() {
-    var image = new Image();
-    image.src = "images/heightHM.png";
-    var canvas = document.createElement("canvas");
+// function getHeight() {
+//     var image = new Image();
+//     image.onload = function () {
+//         var canvas = document.createElement("canvas");
+//         canvas.width = image.width;
+//         canvas.height = image.height;
 
-    
-    canvas.id = "heightMap";
-    canvas.width = image.width;
-    canvas.height = image.height;
-    // document.body.appendChild(canvas);
-    canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
-    var pixelData = canvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 2, 2).data;
-    document.getElementById("cxx").innerHTML = pixelData;
-}
+//         // copy image contents to canvas 
+//         var context = canvas.getContext("2d");
+//         context.drawImage(image, 0, 0, image.width, image.height);
 
-function startup2() {
-    var image = new Image();
-    image.onload = function () {
-        var canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
+//         var heightData = context.getImageData(0, 0, image.width, image.height).data;
 
-        // copy image contents to canvas 
-        var context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0, image.width, image.height);
-
-        var data = context.getImageData(0, 0, image.width, image.height).data;
-
-        document.getElementById("cxx").innerHTML = data;
-        // console.log(
-        //     JSON.stringify(data));
-        console.log(
-            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-    };
-    image.src = "images/heightHM.png";
-}
-//getHeight();
+//         document.getElementById("cxx").innerHTML = heightData;
+//     };
+//     image.src = "images/heightHM.png";
+// }
+// getHeight();
 
 function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,normalArray)
 {
@@ -64,7 +45,7 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
        {
            vertexArray.push(minX+deltaX*j);
            vertexArray.push(minY+deltaY*i);
-           vertexArray.push(0);
+           vertexArray.push(0.6);
            
            // Initialize normal array with zero
            normalArray.push(0);
@@ -89,13 +70,13 @@ function terrainFromIteration(n, minX,maxX,minY,maxY, vertexArray, faceArray,nor
 
     // Perform diamond square algorithm to set z values of each vertex
     // Initialize coner value to random value
-    vertexArray[convertCoordinate(0, 0, n)] = Math.random();
-    vertexArray[convertCoordinate(0, n, n)] = Math.random();
-    vertexArray[convertCoordinate(n, 0, n)] = Math.random();
-    vertexArray[convertCoordinate(n, n, n)] = Math.random();
-    diamondSquare(n, n, vertexArray, 1);
-    normalizeHeight(vertexArray);
-    // Compute pervertex normal   
+    // vertexArray[convertCoordinate(0, 0, n)] = Math.random();
+    // vertexArray[convertCoordinate(0, n, n)] = Math.random();
+    // vertexArray[convertCoordinate(n, 0, n)] = Math.random();
+    // vertexArray[convertCoordinate(n, n, n)] = Math.random();
+    // diamondSquare(n, n, vertexArray, 1);
+    // normalizeHeight(vertexArray);
+    // // Compute pervertex normal   
     computePerVertexNormal(vertexArray, faceArray, normalArray);
 
     return numT;
