@@ -22,17 +22,25 @@
              varying vec3 vPosition;
              varying vec3 position;
 
+             // The texture.
+             uniform sampler2D uHeightMap;
+             uniform sampler2D uColorMap;
+
              varying vec2 vTexCoord;
              
              void main(void) {
                 // Get the vertex position in eye coordinates
                 vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
                 vPosition = vertexPositionEye4.xyz / vertexPositionEye4.w;
-                position = vec3(aVertexPosition);
+
+                vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
+                vec4 color = texture2D(uHeightMap, heightPosition);
+                position = vec3(aVertexPosition.x, aVertexPosition.y, color.x);
+
                 //Calaulate the normal
                 vNormal = normalize(uNMatrix * aVertexNormal);
                 
-                gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+                gl_Position = uPMatrix*uMVMatrix*vec4(position, 1.0);
 
                 vTexCoord=aTexCoord;  
             }
@@ -107,8 +115,9 @@
                 }
                 
                 //vColor = vec4(((uAmbientLightColor*red)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
-                vec2 cdd = vec2(0.5, 0.5);
-                vColor = texture2D(uColorMap, cdd);
+                vec2 colorPosition = vec2(position.x, position.y);
+                vColor = texture2D(uColorMap, colorPosition);
+
                 // Compute fog
                 float fogCoord = (gl_FragCoord.y/gl_FragCoord.w);
                 vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);            

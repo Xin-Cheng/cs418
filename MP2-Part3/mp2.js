@@ -22,7 +22,7 @@ var tIndexTriBuffer;
 var tIndexEdgeBuffer;
 
 // View parameters
-var eyePt = vec3.fromValues(0.0,0.0,1.0);
+var eyePt = vec3.fromValues(0.0,-1.0,1.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
 var up = vec3.fromValues(0.0,1.0,0.0);
 var viewPt = vec3.fromValues(0.0,0.0,0.0);
@@ -39,14 +39,14 @@ var pMatrix = mat4.create();
 var mvMatrixStack = [];
 
 // Dimenstion of terrain
-// var boundaryFar = -2.0;
-// var boundaryNear = 3.0;
-// var boundaryLeft = -3.0;
-// var boundaryRight = 3.0;
+// var boundaryFar = -5.0;
+// var boundaryNear = 5.0;
+// var boundaryLeft = -5.0;
+// var boundaryRight = 5.0;
 var boundaryFar = -1.0;
-var boundaryNear = 1.0;
+var boundaryNear = 16.0;
 var boundaryLeft = -1.0;
-var boundaryRight = 1.0;
+var boundaryRight = 0.0;
 
 // Parameter of flight
 var speed = 0.002;
@@ -131,7 +131,7 @@ function setupTerrainBuffers() {
     var nTerrain=[];
     var eTerrain=[];
     // Grid size 2^n by 2^n
-    var gridN=512;
+    var gridN=1024;
 
     // Size of the terrain, terrain out of the screen will be clipped
     var numT = terrainFromIteration(gridN, boundaryLeft,boundaryRight,boundaryFar,boundaryNear, vTerrain, fTerrain, nTerrain);
@@ -490,7 +490,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(40), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(20), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // Move forwared
     // if(eyePt[1] > boundaryNear-boundaryFar - 1.5) { eyePt[1] = 0.0; }
@@ -503,9 +503,9 @@ function draw() {
     
     //Draw Terrain
     mvPushMatrix();
-    vec3.set(transformVec,0.0,-1.0,-3.0);
+    vec3.set(transformVec,0.5,-1.5,-5.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-75));
+    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-55));
     mat4.mul(mvMatrix, rotationMatrix, mvMatrix);
     setMatrixUniforms();
 
