@@ -9,7 +9,7 @@
         <title>
             Flight
         </title>
-        <h1>MP2: Flight</h1>
+        <h1>MP2: Terrain From Textures</h1>
         <script id="shader-vs" type="x-shader/x-vertex">
             attribute vec3 aVertexNormal;
             attribute vec3 aVertexPosition;
@@ -35,7 +35,7 @@
 
                 vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
                 vec4 color = texture2D(uHeightMap, heightPosition);
-                position = vec3(aVertexPosition.x, aVertexPosition.y, color.x);
+                position = vec3(aVertexPosition.x, aVertexPosition.y, (color.x)/4.0);
                 //position = vec3(aVertexPosition);
                 //Calaulate the normal
                 vNormal = normalize(uNMatrix * aVertexNormal);
@@ -76,6 +76,10 @@
                 vec3 green = vec3(0.13, 0.5, 0.13);
                 vec3 blue = vec3(0.0, 0.41, 0.58);
 
+                vec2 colorPosition = vec2(position.x, position.y);
+                vec4 colorFromMap4 = texture2D(uColorMap, colorPosition);
+                vec3 colorFromMap3 = vec3(colorFromMap4.x, colorFromMap4.y, colorFromMap4.z);
+
                 // Calculate the vector (l) to the light source
                 vec3 vectorToLightSource = normalize(uLightPosition - vPosition);
                 
@@ -114,10 +118,9 @@
                     vColor = vec4(((uAmbientLightColor*blue)+(uDiffuseLightColor*blue) * diffuseLightWeightning+(uSpecularLightColor*blue) * specularLightWeightning),1.0);
                 }
                 
-                //vColor = vec4(((uAmbientLightColor*red)+(uDiffuseLightColor*red) * diffuseLightWeightning+(uSpecularLightColor*red) * specularLightWeightning),1.0);
-                vec2 colorPosition = vec2(position.x, position.y);
-                vColor = texture2D(uColorMap, colorPosition);
+                //vColor = vec4(((uAmbientLightColor*colorFromMap3)+(uDiffuseLightColor*colorFromMap3) * diffuseLightWeightning+(uSpecularLightColor*colorFromMap3) * specularLightWeightning),1.0);
 
+                vColor = colorFromMap4;
                 // Compute fog
                 float fogCoord = (gl_FragCoord.y/gl_FragCoord.w);
                 vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);            
@@ -168,8 +171,8 @@
                     <fieldset style="width:770px">
                         <legend style="padding-top: 1cm;"><h3>Rendering Parameters</h3></legend>
                         <input type="radio" name="primitive" id="wireframe" value="wireframe"> Wireframe
-                        <input type="radio" name="primitive" id="polygon" value="polygon"> Polygon
-                        <input type="radio" name="primitive" id="wirepoly" value="wirepoly" checked=""> Polygon with Edges<br>
+                        <input type="radio" name="primitive" id="polygon" value="polygon" checked> Polygon
+                        <input type="radio" name="primitive" id="wirepoly" value="wirepoly"> Polygon with Edges<br>
                         <h4>Fog switch:</h4> 
                         <label class="switch">
                             <input type="checkbox" id="fogChecked" checked>

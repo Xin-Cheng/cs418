@@ -44,13 +44,13 @@ var mvMatrixStack = [];
 // var boundaryLeft = -5.0;
 // var boundaryRight = 5.0;
 var boundaryFar = -1.0;
-var boundaryNear = 1.0;
+var boundaryNear = 0.0;
 var boundaryLeft = -1.0;
 var boundaryRight = 0.0;
 
 // Parameter of flight
-var speed = 0.002;
-var rate = 0.0005;
+var speed = 0.0005;
+var rate = 0.00005;
 
 
 var heightImage;
@@ -108,7 +108,7 @@ function handleTextureLoaded(image, texture) {
   if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
      // Yes, it's a power of 2. Generate mips.
      gl.generateMipmap(gl.TEXTURE_2D);
-     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
      console.log("Loaded power of 2 texture");
   } else {
      // No, it's not a power of 2. Turn of mips and set wrapping to clamp to edge
@@ -117,7 +117,7 @@ function handleTextureLoaded(image, texture) {
      gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
      console.log("Loaded non-power of 2 texture");
   }
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 }
 
 //-------------------------------------------------------------------------
@@ -317,10 +317,10 @@ function handleKeys() {
   var degree = 5;
   if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
       // Left cursor key or A
-      quaternion = quat.fromEuler(quaternion, 0.0, degToRad(-degree), 0.0);
+      quaternion = quat.fromEuler(quaternion, 0.0, 0.0, degToRad(-degree));
   } else if (currentlyPressedKeys[39] || currentlyPressedKeys[68]) {
       // Right cursor key or D
-      quaternion = quat.fromEuler(quaternion, 0.0, degToRad(degree), 0.0);
+      quaternion = quat.fromEuler(quaternion, 0.0, 0.0, degToRad(degree));
   } 
   if (currentlyPressedKeys[38] || currentlyPressedKeys[87]) {
       // Up cursor key or W
@@ -490,11 +490,11 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(25), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // Move forwared
-    // if(eyePt[1] > boundaryNear-boundaryFar - 1.5) { eyePt[1] = 0.0; }
-    // vec3.add(eyePt, eyePt, vec3.fromValues(0.0, speed, 0.0));
+    if(eyePt[2] < 0.5) {  eyePt[1] = -1.0; eyePt[2] = 1.0; }
+    vec3.add(eyePt, eyePt, vec3.fromValues(0.0, speed, -speed));
     
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
@@ -503,9 +503,9 @@ function draw() {
     
     //Draw Terrain
     mvPushMatrix();
-    vec3.set(transformVec,0.5,-1.2,-2.0);
+    vec3.set(transformVec,0.5,-0.8,-0.25);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
-    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-55));
+    mat4.rotateX(mvMatrix, mvMatrix, degToRad(-65));
     mat4.mul(mvMatrix, rotationMatrix, mvMatrix);
     setMatrixUniforms();
 
@@ -515,7 +515,8 @@ function draw() {
     
     if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked))
     {
-      uploadLightsToShader([20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0], fog);
+      // uploadLightsToShader([20,20,20],[0.25,0.61,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0], fog);
+      uploadLightsToShader([20,20,20],[1.0,1.0,1.0],[0.79,0.88,1.0],[0.79,0.88,1.0], fog);
       drawTerrain();
     }
     
