@@ -36,7 +36,7 @@
                 vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
                 vec4 color = texture2D(uHeightMap, heightPosition);
                 position = vec3(aVertexPosition.x, aVertexPosition.y, color.x);
-
+                //position = vec3(aVertexPosition);
                 //Calaulate the normal
                 vNormal = normalize(uNMatrix * aVertexNormal);
                 

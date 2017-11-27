@@ -44,7 +44,7 @@ var mvMatrixStack = [];
 // var boundaryLeft = -5.0;
 // var boundaryRight = 5.0;
 var boundaryFar = -1.0;
-var boundaryNear = 16.0;
+var boundaryNear = 1.0;
 var boundaryLeft = -1.0;
 var boundaryRight = 0.0;
 
@@ -108,13 +108,13 @@ function handleTextureLoaded(image, texture) {
   if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
      // Yes, it's a power of 2. Generate mips.
      gl.generateMipmap(gl.TEXTURE_2D);
-     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
      console.log("Loaded power of 2 texture");
   } else {
      // No, it's not a power of 2. Turn of mips and set wrapping to clamp to edge
      gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
      gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
      console.log("Loaded non-power of 2 texture");
   }
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -153,7 +153,7 @@ function setupTerrainBuffers() {
     // Specify faces of the terrain 
     tIndexTriBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexTriBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(fTerrain),
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(fTerrain),
                   gl.STATIC_DRAW);
     tIndexTriBuffer.itemSize = 1;
     tIndexTriBuffer.numItems = numT*3;
@@ -162,7 +162,7 @@ function setupTerrainBuffers() {
     generateLinesFromIndexedTriangles(fTerrain,eTerrain);  
     tIndexEdgeBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexEdgeBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(eTerrain),
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(eTerrain),
                   gl.STATIC_DRAW);
     tIndexEdgeBuffer.itemSize = 1;
     tIndexEdgeBuffer.numItems = eTerrain.length;
@@ -204,7 +204,7 @@ function drawTerrain(){
     
   //Draw 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexTriBuffer);
-  gl.drawElements(gl.TRIANGLES, tIndexTriBuffer.numItems, gl.UNSIGNED_SHORT,0);      
+  gl.drawElements(gl.TRIANGLES, tIndexTriBuffer.numItems, gl.UNSIGNED_INT,0);      
 }
 
 //-------------------------------------------------------------------------
@@ -225,7 +225,7 @@ function drawTerrainEdges(){
     
  //Draw 
  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tIndexEdgeBuffer);
- gl.drawElements(gl.LINES, tIndexEdgeBuffer.numItems, gl.UNSIGNED_SHORT,0);      
+ gl.drawElements(gl.LINES, tIndexEdgeBuffer.numItems, gl.UNSIGNED_INT,0);      
 }
 
 //-------------------------------------------------------------------------
@@ -490,7 +490,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(20), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(25), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // Move forwared
     // if(eyePt[1] > boundaryNear-boundaryFar - 1.5) { eyePt[1] = 0.0; }
@@ -503,7 +503,7 @@ function draw() {
     
     //Draw Terrain
     mvPushMatrix();
-    vec3.set(transformVec,0.5,-1.5,-5.0);
+    vec3.set(transformVec,0.5,-1.2,-2.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(-55));
     mat4.mul(mvMatrix, rotationMatrix, mvMatrix);
@@ -548,6 +548,7 @@ function animate() {
  function startup() {
   canvas = document.getElementById("myGLCanvas");
   gl = createGLContext(canvas);
+  var ext = gl.getExtension('OES_element_index_uint');
   setupShaders();
   setupBuffers();
   setupTextures();
