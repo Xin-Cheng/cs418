@@ -34,6 +34,10 @@ var pMatrix = mat4.create();
 
 var mvMatrixStack = [];
 
+// Create a place to hold the bump texture
+var bumpImage;
+var bumpTexture;
+
 //-----------------------------------------------------------------
 //Color conversion  helper functions
 function hexToR(h) {return parseInt((cutHex(h)).substring(0,2),16)}
@@ -42,6 +46,73 @@ function hexToB(h) {return parseInt((cutHex(h)).substring(4,6),16)}
 function cutHex(h) {return (h.charAt(0)=="#") ? h.substring(1,7):h}
 
 
+/**
+ * Creates texture for application to terrain.
+ */
+function setupTextures() {
+  // Texture for bump
+  bumpImage = new Image();
+  bumpTexture = gl.createTexture();
+
+  fillTexture(bumpImage, bumpTexture, "blocks_normal.JPG");
+}
+
+/**
+ * Fill texture with image data.
+ */
+function fillTexture(image, texture, src) {
+  
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  // Fill the texture with a 1x1 blue pixel.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+              new Uint8Array([0, 0, 255, 255]));
+  image.onload = function() { handleTextureLoaded(image, texture); }
+  image.src = src;
+}
+
+/**
+ * @param {number} value Value to determine whether it is a power of 2
+ * @return {boolean} Boolean of whether value is a power of 2
+ */
+function isPowerOf2(value) {
+  return (value & (value - 1)) == 0;
+}
+
+/**
+ * Texture handling. Generates mipmap and sets texture parameters.
+ * @param {Object} image Image for cube application
+ * @param {Object} texture Texture for cube application
+ */
+function handleTextureLoaded(image, texture) {
+  console.log("handleTextureLoaded, image = " + image);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
+  // Check if the image is a power of 2 in both dimensions.
+  if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+     // Yes, it's a power of 2. Generate mips.
+     gl.generateMipmap(gl.TEXTURE_2D);
+     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+     console.log("Loaded power of 2 texture");
+  } else {
+     // No, it's not a power of 2. Turn of mips and set wrapping to clamp to edge
+     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+     gl.texParameteri(gl.TETXURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+     console.log("Loaded non-power of 2 texture");
+  }
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+}
+
+/**
+ * Upload textures to shader
+ */
+function uploadTexture() {
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, bumpTexture);
+  gl.uniform1i(gl.getUniformLocation(shaderProgram, "ubumpTexture"), 0);
+  gl.uniform1f(shaderProgram.uniformFace, 0.0);
+}
 //-------------------------------------------------------------------------
 /**
  * Populates buffers with data for spheres
@@ -325,6 +396,8 @@ function draw() {
  
     // DRAW PHOTOREALISTIC SPHERE
     setupShaders("shader-gouraud-phong-vs","shader-gouraud-phong-fs");
+    uploadTexture();
+
     mvPushMatrix();
     vec3.set(transformVec,0,1,0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
@@ -333,6 +406,8 @@ function draw() {
     
     uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
     uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
+    
+
     setMatrixUniforms();
     drawSphere();
     mvPopMatrix();
@@ -354,6 +429,7 @@ function animate() {
   canvas = document.getElementById("myGLCanvas");
   gl = createGLContext(canvas);
   setupBuffers();
+  setupTextures();
   gl.clearColor(1.0, 1.0, 1.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
   tick();

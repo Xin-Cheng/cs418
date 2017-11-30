@@ -22,6 +22,8 @@
     uniform vec3 uSpecularMaterialColor;
     
     uniform float uShininess;
+
+    uniform sampler2D ubumpTexture;
     
     varying vec4 vColor;
 
@@ -55,10 +57,14 @@
     
     float specularLightWeightning = pow(rdotv, uShininess);
 
+    vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
+    //vec3 color = texture2D(ubumpTexture, heightPosition).xyz;
+    vec4 cxx = texture2D(ubumpTexture, heightPosition);
+    vec3 color = vec3(cxx.x, cxx.y, cxx.z);
     // Sum up all three reflection components and send to the fragment shader
-    vColor = vec4(((uAmbientLightColor*uAmbientMaterialColor)
-                + (uDiffuseLightColor*uDiffuseMaterialColor) * diffuseLightWeightning
-                + (uSpecularLightColor*uSpecularMaterialColor) * specularLightWeightning),1.0);
+    vColor = vec4(((uAmbientLightColor*color)
+                + (uDiffuseLightColor*color) * diffuseLightWeightning
+                + (uSpecularLightColor*color) * specularLightWeightning),1.0);
     
      gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
         
@@ -68,6 +74,7 @@
 <script id="shader-gouraud-phong-fs" type="x-shader/x-fragment">
 precision mediump float;
 varying vec4 vColor;
+
 void main(void) {
         gl_FragColor = vColor;
  }
