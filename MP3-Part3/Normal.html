@@ -9,6 +9,9 @@
 <script id="shader-gouraud-phong-vs" type="x-shader/x-vertex">
    attribute vec3 aVertexNormal;
    attribute vec3 aVertexPosition;
+
+   attribute vec3 aVertexTangent;
+   attribute vec3 aVertexBitangent;
    
     uniform mat4 uMVMatrix;
     uniform mat4 uPMatrix;
@@ -28,6 +31,18 @@
     varying vec4 vColor;
 
     void main(void) {
+
+    // Gram-Schmidt Orthogonalization
+    vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
+    vec3 normal = texture2D(ubumpTexture, heightPosition).xyz;
+    normal = normal*2.0 - 1.0;
+    vec3 tangent = normalize(aVertexTangent - normal*(normal*aVertexTangent)/(normal*normal));
+    vec3 bitanget = normalize(aVertexBitangent - normal*(normal*aVertexBitangent)/(normal*normal) - 
+                    aVertexTangent*(aVertexTangent*aVertexBitangent)/(aVertexTangent*aVertexTangent));
+    
+    // Calculate tbn
+    mat3 tbn = fromValues(tangent.x, bitanget.x, normal.x, tangent.y, bitanget.y, normal.y, tangent.z, bitanget.z, normal.z);
+    //tbn = fromValues(tangent.x, bitanget.x, normal.x, tangent.y, bitanget.y, normal.y, tangent.z, bitanget.z, normal.z);
     
     // Get the vertex position in eye coordinates
     vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -57,10 +72,10 @@
     
     float specularLightWeightning = pow(rdotv, uShininess);
 
-    vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
-    //vec3 color = texture2D(ubumpTexture, heightPosition).xyz;
-    vec4 cxx = texture2D(ubumpTexture, heightPosition);
-    vec3 color = vec3(cxx.x, cxx.y, cxx.z);
+    // Test--------------------------------
+    vec3 color = texture2D(ubumpTexture, heightPosition).xyz;
+    color = color*2.0 - 1.0;
+
     // Sum up all three reflection components and send to the fragment shader
     vColor = vec4(((uAmbientLightColor*color)
                 + (uDiffuseLightColor*color) * diffuseLightWeightning

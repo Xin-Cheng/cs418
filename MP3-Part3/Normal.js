@@ -17,6 +17,12 @@ var sphereVertexPositionBuffer;
 //Create a place to store normals for shading
 var sphereVertexNormalBuffer;
 
+//Create a place to store tanget of vertex
+var sphereVertexTangetBuffer;
+
+//Create a place to store tanget of vertex
+var sphereVertexBitangetBuffer;
+
 // View parameters
 var eyePt = vec3.fromValues(0.0,0.0,10.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
@@ -121,7 +127,9 @@ function setupSphereBuffers() {
     
     var sphereSoup=[];
     var sphereNormals=[];
-    var numT=sphereFromSubdivision(8,sphereSoup,sphereNormals);
+    var sphereTangents=[];
+    var sphereBitangents=[];
+    var numT=sphereFromSubdivision(8,sphereSoup,sphereNormals, sphereTangents, sphereBitangents);
     console.log("Generated ", numT, " triangles"); 
     sphereVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, sphereVertexPositionBuffer);      
@@ -138,7 +146,27 @@ function setupSphereBuffers() {
     sphereVertexNormalBuffer.itemSize = 3;
     sphereVertexNormalBuffer.numItems = numT*3;
     
-    console.log("Normals ", sphereNormals.length/3);     
+    console.log("Normals ", sphereNormals.length/3);    
+    
+    // Specify tangents
+    sphereVertexTangetBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, sphereVertexTangetBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(sphereTangents),
+                  gl.STATIC_DRAW);
+    sphereVertexTangetBuffer.itemSize = 3;
+    sphereVertexTangetBuffer.numItems = numT*3;
+    
+    console.log("Tangents ", sphereTangents.length/3);   
+
+    // Specify bitangents
+    sphereVertexBitangetBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, sphereVertexBitangetBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(sphereBitangents),
+                  gl.STATIC_DRAW);
+    sphereVertexBitangetBuffer.itemSize = 3;
+    sphereVertexBitangetBuffer.numItems = numT*3;
+    
+    console.log("Bitangents ", sphereBitangents.length/3);   
 }
 
 //-------------------------------------------------------------------------
@@ -155,7 +183,20 @@ function drawSphere(){
  gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 
                            sphereVertexNormalBuffer.itemSize,
                            gl.FLOAT, false, 0, 0);
- gl.drawArrays(gl.TRIANGLES, 0, sphereVertexPositionBuffer.numItems);      
+
+  // Bind tangent buffer
+  gl.bindBuffer(gl.ARRAY_BUFFER, sphereVertexTangetBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexTangentAttribute, 
+                            sphereVertexTangetBuffer.itemSize,
+                            gl.FLOAT, false, 0, 0);    
+  
+  // Bind bitangent buffer
+  gl.bindBuffer(gl.ARRAY_BUFFER, sphereVertexBitangetBuffer);
+  gl.vertexAttribPointer(shaderProgram.vertexBitangentAttribute, 
+                            sphereVertexBitangetBuffer.itemSize,
+                            gl.FLOAT, false, 0, 0);    
+
+  gl.drawArrays(gl.TRIANGLES, 0, sphereVertexPositionBuffer.numItems);      
 }
 
 //-------------------------------------------------------------------------
@@ -321,6 +362,12 @@ function setupShaders(vshader,fshader) {
 
   shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
   gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
+
+  shaderProgram.vertexTangentAttribute = gl.getAttribLocation(shaderProgram, "aVertexTangent");
+  gl.enableVertexAttribArray(shaderProgram.vertexTangentAttribute);
+
+  shaderProgram.vertexBitangentAttribute = gl.getAttribLocation(shaderProgram, "aVertexBitangent");
+  gl.enableVertexAttribArray(shaderProgram.vertexBitangentAttribute);
 
   shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");

@@ -88,7 +88,7 @@ function planeFromSubdivision(n, minX,maxX,minY,maxY, vertexArray)
 }
 
 //-----------------------------------------------------------
-function sphDivideTriangle(a,b,c,numSubDivs, vertexArray,normalArray)
+function sphDivideTriangle(a,b,c,numSubDivs, vertexArray,normalArray,tangentArray,bitangentArray)
 {
     if (numSubDivs>0)
     {
@@ -106,10 +106,10 @@ function sphDivideTriangle(a,b,c,numSubDivs, vertexArray,normalArray)
         vec4.lerp(bc,b,c,0.5);
         vec4.normalize(bc,bc);
         
-        numT+=sphDivideTriangle(a,ab,ac,numSubDivs-1, vertexArray, normalArray);
-        numT+=sphDivideTriangle(ab,b,bc,numSubDivs-1, vertexArray, normalArray);
-        numT+=sphDivideTriangle(bc,c,ac,numSubDivs-1, vertexArray, normalArray);
-        numT+=sphDivideTriangle(ab,bc,ac,numSubDivs-1, vertexArray, normalArray);
+        numT+=sphDivideTriangle(a,ab,ac,numSubDivs-1, vertexArray, normalArray,tangentArray,bitangentArray);
+        numT+=sphDivideTriangle(ab,b,bc,numSubDivs-1, vertexArray, normalArray,tangentArray,bitangentArray);
+        numT+=sphDivideTriangle(bc,c,ac,numSubDivs-1, vertexArray, normalArray,tangentArray,bitangentArray);
+        numT+=sphDivideTriangle(ab,bc,ac,numSubDivs-1, vertexArray, normalArray,tangentArray,bitangentArray);
         return numT;
     }
     else
@@ -125,6 +125,45 @@ function sphDivideTriangle(a,b,c,numSubDivs, vertexArray,normalArray)
         pushVertex(a,normalArray);
         pushVertex(b,normalArray);
         pushVertex(c,normalArray);
+
+        // Calculate tangent for each vertex
+        var u1 = a[0];
+        var u2 = b[0];
+        var u3 = c[0];
+
+        var v1 = a[1];
+        var v2 = b[1];
+        var v3 = c[1];
+
+        var p2_p1 = vec4.create();
+        vec4.subtract(p2_p1, b, a);
+        var p3_p1 = vec4.create();
+        vec4.subtract(p2_p1, c, a);
+
+        var tangent = vec4.create();
+        var first = vec4.create();
+        vec4.scale(first, p2_p1, v3-v1);
+        var second = vec4.create();
+        vec4.scale(second, p3_p1, v2-v1);
+        vec4.subtract(tangent, first, second);
+        vec4.scale(tangent, tangent, ((u2-u1)*(v3-v1))-((v2-v1)*(u3-u1)));
+        vec4.normalize(tangent,tangent);
+
+        var bitangent = vec4.create();
+        vec4.scale(first, p2_p1, u3-u1);
+        vec4.scale(second, p3_p1, u2-u1);
+        vec4.subtract(bitangent, first, second);
+        vec4.scale(bitangent, bitangent, ((v2-v1)*(u3-u1))-((u2-u1)*(v3-v1)));
+        vec4.normalize(bitangent,bitangent);
+        
+        // And add tangents and bitangents to array
+        pushVertex(tangent,tangentArray);
+        pushVertex(tangent,tangentArray);
+        pushVertex(tangent,tangentArray);
+
+        pushVertex(bitangent,bitangentArray);
+        pushVertex(bitangent,bitangentArray);
+        pushVertex(bitangent,bitangentArray);
         
         return 1;
         
@@ -132,7 +171,7 @@ function sphDivideTriangle(a,b,c,numSubDivs, vertexArray,normalArray)
 }
 
 //-------------------------------------------------------------------------
-function sphereFromSubdivision(numSubDivs, vertexArray, normalArray)
+function sphereFromSubdivision(numSubDivs, vertexArray, normalArray, tangentArray, bitangentArray)
 {
     var numT=0;
     var a = vec4.fromValues(0.0,0.0,-1.0,0);
@@ -140,13 +179,9 @@ function sphereFromSubdivision(numSubDivs, vertexArray, normalArray)
     var c = vec4.fromValues(-0.816497,-0.471405,0.333333,0);
     var d = vec4.fromValues(0.816497,-0.471405,0.333333,0);
     
-    numT+=sphDivideTriangle(a,b,c,numSubDivs, vertexArray, normalArray);
-    numT+=sphDivideTriangle(d,c,b,numSubDivs, vertexArray, normalArray);
-    numT+=sphDivideTriangle(a,d,b,numSubDivs, vertexArray, normalArray);
-    numT+=sphDivideTriangle(a,c,d,numSubDivs, vertexArray, normalArray);
+    numT+=sphDivideTriangle(a,b,c,numSubDivs, vertexArray, normalArray, tangentArray, bitangentArray);
+    numT+=sphDivideTriangle(d,c,b,numSubDivs, vertexArray, normalArray, tangentArray, bitangentArray);
+    numT+=sphDivideTriangle(a,d,b,numSubDivs, vertexArray, normalArray, tangentArray, bitangentArray);
+    numT+=sphDivideTriangle(a,c,d,numSubDivs, vertexArray, normalArray, tangentArray, bitangentArray);
     return numT;
 }
-
-
-    
-    
