@@ -41,8 +41,7 @@
                     aVertexTangent*(aVertexTangent*aVertexBitangent)/(aVertexTangent*aVertexTangent));
     
     // Calculate tbn
-    mat3 tbn = fromValues(tangent.x, bitanget.x, normal.x, tangent.y, bitanget.y, normal.y, tangent.z, bitanget.z, normal.z);
-    //tbn = fromValues(tangent.x, bitanget.x, normal.x, tangent.y, bitanget.y, normal.y, tangent.z, bitanget.z, normal.z);
+    mat3 tbn = mat3(tangent.x, bitanget.x, normal.x, tangent.y, bitanget.y, normal.y, tangent.z, bitanget.z, normal.z);
     
     // Get the vertex position in eye coordinates
     vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -72,14 +71,10 @@
     
     float specularLightWeightning = pow(rdotv, uShininess);
 
-    // Test--------------------------------
-    vec3 color = texture2D(ubumpTexture, heightPosition).xyz;
-    color = color*2.0 - 1.0;
-
     // Sum up all three reflection components and send to the fragment shader
-    vColor = vec4(((uAmbientLightColor*color)
-                + (uDiffuseLightColor*color) * diffuseLightWeightning
-                + (uSpecularLightColor*color) * specularLightWeightning),1.0);
+    vColor = vec4(((uAmbientLightColor*uAmbientMaterialColor)
+                + (uDiffuseLightColor*uDiffuseMaterialColor) * diffuseLightWeightning
+                + (uSpecularLightColor*uSpecularMaterialColor) * specularLightWeightning),1.0);
     
      gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
         
