@@ -60,7 +60,7 @@ function setupTextures() {
   bumpImage = new Image();
   bumpTexture = gl.createTexture();
 
-  fillTexture(bumpImage, bumpTexture, "blocks_normal.JPG");
+  fillTexture(bumpImage, bumpTexture, "normal_4.png");
 }
 
 /**
@@ -449,7 +449,7 @@ function draw() {
     vec3.set(transformVec,0,1,0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     
-    R=1.0;G=0.0;B=0.0;shiny=20.0;
+    R=1.0;G=1.0;B=0.0;shiny=10.0;
     
     uploadLightsToShader([20,20,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
     uploadMaterialToShader([R,G,B],[R,G,B],[1.0,1.0,1.0],shiny);
