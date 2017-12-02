@@ -36,27 +36,29 @@
     //vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
     //vec3 normal = texture2D(ubumpTexture, heightPosition).xyz;
     //normal = normal*2.0 - 1.0;
-    vec3 normal = normalize(aVertexNormal);
-    vec3 tangent = normalize(aVertexTangent - normal*(normal*aVertexTangent)/(normal*normal));
-    vec3 bitanget = normalize(aVertexBitangent - normal*(normal*aVertexBitangent)/(normal*normal) - 
-                    aVertexTangent*(aVertexTangent*aVertexBitangent)/(aVertexTangent*aVertexTangent));
-    
+    vec3 normal = normalize(uNMatrix*aVertexNormal);
+    //vec3 tangent = normalize(uNMatrix*(aVertexTangent - normal*(normal*aVertexTangent)/(normal*normal)));
+    //vec3 bitanget = normalize(uNMatrix*(aVertexBitangent - normal*(normal*aVertexBitangent)/(normal*normal) - 
+    //                aVertexTangent*(aVertexTangent*aVertexBitangent)/(aVertexTangent*aVertexTangent)));
+    vec3 tangent = normalize(aVertexTangent);
+    vec3 bitanget = normalize(cross(tangent, normal));
     // Calculate tbn
-    mat3 tbn = mat3(tangent.x, tangent.y, tangent.z, bitanget.x, bitanget.y, bitanget.z, normal.x, normal.y, normal.z);
-    
+    //mat3 tbn = mat3(tangent.x, tangent.y, tangent.z, bitanget.x, bitanget.y, bitanget.z, normal.x, normal.y, normal.z);
+    mat3 tbn = mat3(tangent.x, bitanget.x, normal.x, tangent.y, bitanget.y, normal.y, tangent.z, bitanget.z, normal.z);
+
     // Get the vertex position in eye coordinates
     vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
     vec3 vertexPositionEye3 = vertexPositionEye4.xyz / vertexPositionEye4.w;
   
     // Calculate the vector (l) to the light source
-    vec3 vectorToLightSource = normalize(uLightPosition - vertexPositionEye3);
+    vec3 vectorToLightSource = normalize(tbn*(uLightPosition - vertexPositionEye3));
     
     vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
     vec3 n = texture2D(ubumpTexture, heightPosition).xyz;
-    n = n*2.0 - 1.0;
+    n = normalize(n*2.0 - 1.0);
 
     // Transform the normal (n) to eye coordinates
-    vec3 normalEye = normalize(uNMatrix * n);
+    vec3 normalEye = normalize(n);
     
     // Calculate n dot l for diffuse lighting
     float diffuseLightWeightning = max(dot(normalEye, 
@@ -70,7 +72,7 @@
     // along the negative z-axis. Calculate viewVector (v) 
     // in eye coordinates as:
     // (0.0, 0.0, 0.0) - vertexPositionEye3
-    vec3 viewVectorEye = -normalize(vertexPositionEye3);
+    vec3 viewVectorEye = -tbn*normalize(vertexPositionEye3);
     
     float rdotv = max(dot(reflectionVector, viewVectorEye), 0.0);
     
