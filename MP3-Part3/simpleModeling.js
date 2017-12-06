@@ -126,7 +126,7 @@ function sphDivideTriangle(a,b,c,numSubDivs, vertexArray,normalArray,tangentArra
         pushVertex(b,normalArray);
         pushVertex(c,normalArray);
 
-        // Calculate tangent for each vertex
+        // Calculate tangent and bitanget for each vertex
         var u1 = a[0];
         var u2 = b[0];
         var u3 = c[0];
