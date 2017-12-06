@@ -36,7 +36,8 @@
     //vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
     //vec3 normal = texture2D(ubumpTexture, heightPosition).xyz;
     //normal = normal*2.0 - 1.0;
-    vec3 normal = normalize(uNMatrix*aVertexNormal);
+    //vec3 normal = normalize(uNMatrix*aVertexNormal);
+    vec3 normal = normalize(aVertexNormal);
     //vec3 tangent = normalize(uNMatrix*(aVertexTangent - normal*(normal*aVertexTangent)/(normal*normal)));
     //vec3 bitanget = normalize(uNMatrix*(aVertexBitangent - normal*(normal*aVertexBitangent)/(normal*normal) - 
     //                aVertexTangent*(aVertexTangent*aVertexBitangent)/(aVertexTangent*aVertexTangent)));
@@ -54,6 +55,7 @@
     vec3 vectorToLightSource = normalize(tbn*(uLightPosition - vertexPositionEye3));
     
     vec2 heightPosition = vec2(aVertexPosition.x, aVertexPosition.y);
+    //vec2 heightPosition = vec2(vertexPositionEye3.x, vertexPositionEye3.y);
     vec3 n = texture2D(ubumpTexture, heightPosition).xyz;
     n = normalize(n*2.0 - 1.0);
 

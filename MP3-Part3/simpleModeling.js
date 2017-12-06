@@ -138,7 +138,7 @@ function sphDivideTriangle(a,b,c,numSubDivs, vertexArray,normalArray,tangentArra
         var p2_p1 = vec4.create();
         vec4.subtract(p2_p1, b, a);
         var p3_p1 = vec4.create();
-        vec4.subtract(p2_p1, c, a);
+        vec4.subtract(p3_p1, c, a);
 
         var tangent = vec4.create();
         var first = vec4.create();

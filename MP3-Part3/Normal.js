@@ -60,7 +60,8 @@ function setupTextures() {
   bumpImage = new Image();
   bumpTexture = gl.createTexture();
 
-  fillTexture(bumpImage, bumpTexture, "bumpmap.jpg");
+  fillTexture(bumpImage, bumpTexture, "blocks_normal.JPG");
+  //fillTexture(bumpImage, bumpTexture, "bumpmap.jpg");
 }
 
 /**
@@ -129,7 +130,7 @@ function setupSphereBuffers() {
     var sphereNormals=[];
     var sphereTangents=[];
     var sphereBitangents=[];
-    var numT=sphereFromSubdivision(8,sphereSoup,sphereNormals, sphereTangents, sphereBitangents);
+    var numT=sphereFromSubdivision(10,sphereSoup,sphereNormals, sphereTangents, sphereBitangents);
     console.log("Generated ", numT, " triangles"); 
     sphereVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, sphereVertexPositionBuffer);      
@@ -449,9 +450,9 @@ function draw() {
     vec3.set(transformVec,0,0,0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     
-    R=1.0;G=1.0;B=0.0;shiny=5.0;
+    R=1.0;G=1.0;B=0.0;shiny=25.0;
     
-    uploadLightsToShader([20,20,10],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
+    uploadLightsToShader([20,30,20],[0.0,0.0,0.0],[1.0,1.0,1.0],[1.0,1.0,1.0]);
     uploadMaterialToShader([R,G,B],[R,G,B],[0.5,0.5,0.5],shiny);
     
 
