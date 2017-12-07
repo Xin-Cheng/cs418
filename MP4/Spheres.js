@@ -30,6 +30,42 @@ var pMatrix = mat4.create();
 
 var mvMatrixStack = [];
 
+class Sphere {
+  constructor(size, color, position) {
+    this.size = size;
+    this.color = color;
+    this.position = position;
+  }
+}
+
+// Create a place to store attributes of shpere
+var sphereSize;
+var sphereMaterialColor;
+var spherePosition;
+
+/**
+ * Gerate a sphere with random size, color and position.
+ */
+function generateSphere() {
+  var sphereScale = Math.random()*10;
+  sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
+  sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
+  spherePosition = vec3.fromValues(generateRandomNumber(),generateRandomNumber(),0.0);
+  return new Sphere(sphereSize,sphereMaterialColor,spherePosition);
+}
+
+/**
+ * Gerate a random number.
+ */
+function generateRandomNumber() {
+  var randomSign = Math.random() < 0.5 ? -1 : 1;
+  var randomNumber = Math.random()*10;
+  var off = randomNumber*randomSign;
+  return off;
+}
+
+var sphere = generateSphere();
+var sphere1 = generateSphere();
 //-------------------------------------------------------------------------
 function setupSphereBuffers() {
     
@@ -235,16 +271,8 @@ function setupBuffers() {
     setupSphereBuffers();     
 }
 
-var position = vec3.fromValues(generateRandomNumber(),generateRandomNumber(),0.0);
-function generateRandomNumber() {
-  var randomSign = Math.random() < 0.5 ? -1 : 1;
-  var randomNumber = Math.random()*10;
-  var off = randomNumber*randomSign;
-  return off;
-}
-
 //----------------------------------------------------------------------------------
-function draw(position) { 
+function draw() { 
     var transformVec = vec3.create();
   
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -268,20 +296,24 @@ function draw(position) {
     //console.log(vec4.str(lightPosEye4))
     var lightPosEye = vec3.fromValues(lightPosEye4[0],lightPosEye4[1],lightPosEye4[2]);
     
-    //draw Sun
+    // draw shpere
     // Set up material parameters    
-    var ka = vec3.fromValues(0.0,0.0,0.0);
-    var kd = vec3.fromValues(0.6,0.6,0.0);
-    var ks = vec3.fromValues(0.4,0.4,0.0);
+
     mvPushMatrix();
-    vec3.set(transformVec,5,5,5);
-    mat4.scale(mvMatrix, mvMatrix,transformVec);
-
-    //var position = vec3.fromValues(1.0,0,1.0);
-
-    mat4.translate(mvMatrix, mvMatrix,position);
+    mat4.scale(mvMatrix, mvMatrix,sphere.size);
+    mat4.translate(mvMatrix, mvMatrix,sphere.position);
     uploadLightsToShader(lightPosEye,Ia,Id,Is);
-    uploadMaterialToShader(ka,kd,ks);
+    uploadMaterialToShader(sphere.color,sphere.color,sphere.color);
+    setMatrixUniforms();
+    drawSphere();
+    mvPopMatrix(); 
+
+    // sphere1
+    mvPushMatrix();
+    mat4.scale(mvMatrix, mvMatrix,sphere1.size);
+    mat4.translate(mvMatrix, mvMatrix,sphere1.position);
+    uploadLightsToShader(lightPosEye,Ia,Id,Is);
+    uploadMaterialToShader(sphere1.color,sphere1.color,sphere1.color);
     setMatrixUniforms();
     drawSphere();
     mvPopMatrix(); 
@@ -306,7 +338,7 @@ function startup() {
 //----------------------------------------------------------------------------------
 function tick() {
     requestAnimFrame(tick);
-    draw(position);
+    draw();
     animate();
 }
 
