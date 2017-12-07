@@ -43,16 +43,27 @@ var sphereSize;
 var sphereMaterialColor;
 var spherePosition;
 
+var numberOfSphere = 1;
+
+var spheres = [];
 /**
  * Gerate a sphere with random size, color and position.
  */
 function generateSphere() {
-  var sphereScale = Math.random()*10;
+  var sphereScale = Math.random()*2;
   sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
   sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
-  spherePosition = vec3.fromValues(generateRandomNumber(),generateRandomNumber(),0.0);
+  spherePosition = vec3.fromValues(generateRandomNumber(),generateRandomNumber(),Math.random());
   return new Sphere(sphereSize,sphereMaterialColor,spherePosition);
 }
+
+function generateSphereArray(number) {
+  for(var i = 0; i < number; i++) {
+    spheres.push(generateSphere());
+  }
+}
+
+generateSphereArray(numberOfSphere);
 
 /**
  * Gerate a random number.
@@ -64,8 +75,7 @@ function generateRandomNumber() {
   return off;
 }
 
-var sphere = generateSphere();
-var sphere1 = generateSphere();
+
 //-------------------------------------------------------------------------
 function setupSphereBuffers() {
     
@@ -298,25 +308,17 @@ function draw() {
     
     // draw shpere
     // Set up material parameters    
-
-    mvPushMatrix();
-    mat4.scale(mvMatrix, mvMatrix,sphere.size);
-    mat4.translate(mvMatrix, mvMatrix,sphere.position);
-    uploadLightsToShader(lightPosEye,Ia,Id,Is);
-    uploadMaterialToShader(sphere.color,sphere.color,sphere.color);
-    setMatrixUniforms();
-    drawSphere();
-    mvPopMatrix(); 
-
-    // sphere1
-    mvPushMatrix();
-    mat4.scale(mvMatrix, mvMatrix,sphere1.size);
-    mat4.translate(mvMatrix, mvMatrix,sphere1.position);
-    uploadLightsToShader(lightPosEye,Ia,Id,Is);
-    uploadMaterialToShader(sphere1.color,sphere1.color,sphere1.color);
-    setMatrixUniforms();
-    drawSphere();
-    mvPopMatrix(); 
+    for (var i = 0; i < numberOfSphere; i++) {
+      var sphere = spheres[i];
+      mvPushMatrix();
+      mat4.scale(mvMatrix, mvMatrix,sphere.size);
+      mat4.translate(mvMatrix, mvMatrix,sphere.position);
+      uploadLightsToShader(lightPosEye,Ia,Id,Is);
+      uploadMaterialToShader(sphere.color,sphere.color,sphere.color);
+      setMatrixUniforms();
+      drawSphere();
+      mvPopMatrix(); 
+    }
 }
 
 //----------------------------------------------------------------------------------
