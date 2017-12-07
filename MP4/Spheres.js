@@ -57,20 +57,25 @@ function generateSphere() {
   return new Sphere(sphereSize,sphereMaterialColor,spherePosition);
 }
 
-function generateSphereArray(number) {
-  for(var i = 0; i < number; i++) {
+function generateSphereArray() {
+  for(var i = 0; i < numberOfSphere; i++) {
     spheres.push(generateSphere());
   }
+  var increasement = document.getElementById("numberOfBalls").value;
+  numberOfSphere += increasement.length == 0 ? 1 : parseInt(increasement);
 }
 
-generateSphereArray(numberOfSphere);
+function resetSphereArray() {
+  numberOfSphere = 1;
+  spheres.push(generateSphere());
+}
 
 /**
  * Gerate a random number.
  */
 function generateRandomNumber() {
   var randomSign = Math.random() < 0.5 ? -1 : 1;
-  var randomNumber = Math.random()*10;
+  var randomNumber = Math.random()*25;
   var off = randomNumber*randomSign;
   return off;
 }
@@ -334,6 +339,9 @@ function startup() {
   setupBuffers();
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
+  generateSphereArray();
+  document.getElementById("generateBall").addEventListener("click", generateSphereArray);
+  document.getElementById("reset").addEventListener("click", resetSphereArray);
   tick();
 }
 
