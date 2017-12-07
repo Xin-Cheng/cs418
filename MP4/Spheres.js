@@ -235,8 +235,16 @@ function setupBuffers() {
     setupSphereBuffers();     
 }
 
+var position = vec3.fromValues(generateRandomNumber(),generateRandomNumber(),0.0);
+function generateRandomNumber() {
+  var randomSign = Math.random() < 0.5 ? -1 : 1;
+  var randomNumber = Math.random()*10;
+  var off = randomNumber*randomSign;
+  return off;
+}
+
 //----------------------------------------------------------------------------------
-function draw() { 
+function draw(position) { 
     var transformVec = vec3.create();
   
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -268,8 +276,8 @@ function draw() {
     mvPushMatrix();
     vec3.set(transformVec,5,5,5);
     mat4.scale(mvMatrix, mvMatrix,transformVec);
-    
-    var position = vec3.fromValues(1.0,0,1.0);
+
+    //var position = vec3.fromValues(1.0,0,1.0);
 
     mat4.translate(mvMatrix, mvMatrix,position);
     uploadLightsToShader(lightPosEye,Ia,Id,Is);
@@ -298,7 +306,7 @@ function startup() {
 //----------------------------------------------------------------------------------
 function tick() {
     requestAnimFrame(tick);
-    draw();
+    draw(position);
     animate();
 }
 
