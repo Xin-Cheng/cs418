@@ -6,7 +6,7 @@ var vertexPositionBuffer;
 
 var days=0;
 var GRAVITY = -10.0;
-var GRAG = 0.8;
+var GRAG = 0.9;
 
 
 // Create a place to store sphere geometry
@@ -38,8 +38,11 @@ var sphereMaterialColor;
 var spherePosition;
 var sphereVelocity;
 
-var numberOfSphere = 1;
+var numberOfSphere = 0;
 
+/**
+ * Sphere class.
+ */
 class Sphere {
   constructor(size, color, position, velocity) {
     this.size = size;
@@ -47,10 +50,11 @@ class Sphere {
     this.position = position;
     this.velocity = velocity;
   }
+
+  // Change the velocity and position of spheres
   update() {
     var time = 0.02;
-    this.velocity[1] = this.velocity[1]*Math.pow(GRAG, time) + GRAVITY*time;  
-    this.position[1] = this.position[1] + this.velocity[1]*time;
+
 
     if(this.velocity[1] < 0 && -this.velocity[1] < Math.abs(GRAVITY*time) && this.position[1] <= -10.0) {
       return; 
@@ -58,6 +62,11 @@ class Sphere {
     if(this.position[1] <= -10.0) { 
       this.velocity[1] = -this.velocity[1];
     }
+
+    // Update the velocity using the set of forces you are implementing (e.g. gravity and friction) 
+    this.velocity[1] = this.velocity[1]*Math.pow(GRAG, time) + GRAVITY*time;  
+    // Update the position using the current velocity and Euler Integration
+    this.position[1] = this.position[1] + this.velocity[1]*time;
   }
 }
 
@@ -70,11 +79,14 @@ function generateSphere() {
   var sphereScale = Math.random()*2;
   sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
   sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
-  spherePosition = vec3.fromValues(1.5*generateRandomNumber(),generateRandomNumber(),Math.random());
+  spherePosition = vec3.fromValues(generateRandomNumber(),generateRandomNumber()+10,Math.random());
   sphereVelocity = vec3.fromValues(0,-Math.random(), 0);
   return new Sphere(sphereSize,sphereMaterialColor,spherePosition,sphereVelocity);
 }
 
+/**
+ * Function that will generate an array of spheres.
+ */
 function generateSphereArray() {
   var increasement = document.getElementById("numberOfBalls").value;
   numberOfSphere = increasement.length == 0 ? 0 : parseInt(increasement);
@@ -83,10 +95,12 @@ function generateSphereArray() {
   }
 }
 
+/**
+ * Function that will remove all existing spheres from the scene.
+ */
 function resetSphereArray() {
-  numberOfSphere = 1;
+  numberOfSphere = 0;
   spheres = [];
-  spheres.push(generateSphere());
 }
 
 /**
@@ -94,7 +108,7 @@ function resetSphereArray() {
  */
 function generateRandomNumber() {
   var randomSign = Math.random() < 0.5 ? -1 : 1;
-  var randomNumber = Math.random()*10;
+  var randomNumber = Math.random()*20;
   var off = randomNumber*randomSign;
   return off;
 }
