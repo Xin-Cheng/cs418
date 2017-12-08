@@ -58,15 +58,16 @@ function generateSphere() {
 }
 
 function generateSphereArray() {
+  var increasement = document.getElementById("numberOfBalls").value;
+  numberOfSphere = increasement.length == 0 ? 0 : parseInt(increasement);
   for(var i = 0; i < numberOfSphere; i++) {
     spheres.push(generateSphere());
   }
-  var increasement = document.getElementById("numberOfBalls").value;
-  numberOfSphere += increasement.length == 0 ? 1 : parseInt(increasement);
 }
 
 function resetSphereArray() {
   numberOfSphere = 1;
+  spheres = [];
   spheres.push(generateSphere());
 }
 
@@ -313,7 +314,7 @@ function draw() {
     
     // draw shpere
     // Set up material parameters    
-    for (var i = 0; i < numberOfSphere; i++) {
+    for (var i = 0; i < spheres.length; i++) {
       var sphere = spheres[i];
       mvPushMatrix();
       mat4.scale(mvMatrix, mvMatrix,sphere.size);
