@@ -5,6 +5,8 @@ var shaderProgram;
 var vertexPositionBuffer;
 
 var days=0;
+var GRAVITY = -10.0;
+var GRAG = 0.8;
 
 
 // Create a place to store sphere geometry
@@ -30,22 +32,37 @@ var pMatrix = mat4.create();
 
 var mvMatrixStack = [];
 
-class Sphere {
-  constructor(size, color, position) {
-    this.size = size;
-    this.color = color;
-    this.position = position;
-  }
-}
-
 // Create a place to store attributes of shpere
 var sphereSize;
 var sphereMaterialColor;
 var spherePosition;
+var sphereVelocity;
 
 var numberOfSphere = 1;
 
+class Sphere {
+  constructor(size, color, position, velocity) {
+    this.size = size;
+    this.color = color;
+    this.position = position;
+    this.velocity = velocity;
+  }
+  update() {
+    var time = 0.02;
+    this.velocity[1] = this.velocity[1]*Math.pow(GRAG, time) + GRAVITY*time;  
+    this.position[1] = this.position[1] + this.velocity[1]*time;
+
+    if(this.velocity[1] < 0 && -this.velocity[1] < Math.abs(GRAVITY*time) && this.position[1] <= -10.0) {
+      return; 
+    } 
+    if(this.position[1] <= -10.0) { 
+      this.velocity[1] = -this.velocity[1];
+    }
+  }
+}
+
 var spheres = [];
+var move = 1;
 /**
  * Gerate a sphere with random size, color and position.
  */
@@ -53,8 +70,9 @@ function generateSphere() {
   var sphereScale = Math.random()*2;
   sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
   sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
-  spherePosition = vec3.fromValues(generateRandomNumber(),generateRandomNumber(),Math.random());
-  return new Sphere(sphereSize,sphereMaterialColor,spherePosition);
+  spherePosition = vec3.fromValues(1.5*generateRandomNumber(),generateRandomNumber(),Math.random());
+  sphereVelocity = vec3.fromValues(0,-Math.random(), 0);
+  return new Sphere(sphereSize,sphereMaterialColor,spherePosition,sphereVelocity);
 }
 
 function generateSphereArray() {
@@ -76,7 +94,7 @@ function resetSphereArray() {
  */
 function generateRandomNumber() {
   var randomSign = Math.random() < 0.5 ? -1 : 1;
-  var randomNumber = Math.random()*25;
+  var randomNumber = Math.random()*10;
   var off = randomNumber*randomSign;
   return off;
 }
@@ -295,7 +313,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(25), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
@@ -318,6 +336,7 @@ function draw() {
       var sphere = spheres[i];
       mvPushMatrix();
       mat4.scale(mvMatrix, mvMatrix,sphere.size);
+      sphere.update();
       mat4.translate(mvMatrix, mvMatrix,sphere.position);
       uploadLightsToShader(lightPosEye,Ia,Id,Is);
       uploadMaterialToShader(sphere.color,sphere.color,sphere.color);
