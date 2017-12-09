@@ -16,7 +16,7 @@ var sphereVertexPositionBuffer;
 var sphereVertexNormalBuffer;
 
 // View parameters
-var eyePt = vec3.fromValues(0.0,0.0,150.0);
+var eyePt = vec3.fromValues(0.0,0.0,50.0);
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
 var up = vec3.fromValues(0.0,1.0,0.0);
 var viewPt = vec3.fromValues(0.0,0.0,0.0);
@@ -65,7 +65,7 @@ class Sphere {
       this.velocity[1] = -this.velocity[1];
     }
 
-    if(Math.abs(this.position[0]) >= 15) { 
+    if(Math.abs(this.position[0]) >= 12) { 
       this.velocity[0] = -this.velocity[0];
     }
 
@@ -93,8 +93,8 @@ function generateSphere() {
   var sphereScale = Math.random()*2;
   sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
   sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
-  spherePosition = vec3.fromValues(1.5*generateRandomNumber(),2*generateRandomNumber()+10,Math.random());
-  sphereVelocity = vec3.fromValues(6*Math.random()-3,2*Math.random()-1, 6*Math.random()-3);
+  spherePosition = vec3.fromValues(1.2*generateRandomNumber(),2*generateRandomNumber()+10,Math.random());
+  sphereVelocity = vec3.fromValues(6*Math.random()-3,2*Math.random()-1, 10*Math.random()-5);
   return new Sphere(sphereSize,sphereMaterialColor,spherePosition,sphereVelocity);
 }
 
@@ -341,7 +341,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // We'll use perspective 
-    mat4.perspective(pMatrix,degToRad(25), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+    mat4.perspective(pMatrix,degToRad(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
     // We want to look down -z, so create a lookat point in that direction    
     vec3.add(viewPt, eyePt, viewDir);
