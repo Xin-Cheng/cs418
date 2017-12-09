@@ -55,17 +55,21 @@ class Sphere {
   update() {
     var time = 0.02;
 
-
+    // If the velocity is smaller than a threshold, set the velocity to zero
     if(this.velocity[1] < 0 && -this.velocity[1] < Math.abs(GRAVITY*time) && this.position[1] <= -10.0) {
       return; 
     } 
-    if(this.position[1] <= -10.0 || this.position[1] >= 10) { 
+
+    // Change the velocity direction if the ball hits the wall
+    if(this.position[1] <= -10.0 || this.position[1] >= 30) { 
       this.velocity[1] = -this.velocity[1];
     }
-    if(this.position[0] <= -20.0 || this.position[0] >= 20) { 
+
+    if(Math.abs(this.position[0]) >= 15) { 
       this.velocity[0] = -this.velocity[0];
     }
-    if(this.position[2] <= -1 || this.position[2] >= 1) { 
+
+    if(Math.abs(this.position[2]) >= 1) { 
       this.velocity[2] = -this.velocity[2];
     }
 
@@ -77,7 +81,6 @@ class Sphere {
     vec3.scale(positionOff, this.velocity, time);
 
     vec3.add(this.position, this.position, positionOff);
-    // this.position[1] = this.position[1] + this.velocity[1]*time;
   }
 }
 
@@ -90,8 +93,8 @@ function generateSphere() {
   var sphereScale = Math.random()*2;
   sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
   sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
-  spherePosition = vec3.fromValues(2*generateRandomNumber(),generateRandomNumber(),Math.random());
-  sphereVelocity = vec3.fromValues(5*Math.random()-2.5,2*Math.random()-1, 5*Math.random()-2.5);
+  spherePosition = vec3.fromValues(1.5*generateRandomNumber(),2*generateRandomNumber()+10,Math.random());
+  sphereVelocity = vec3.fromValues(6*Math.random()-3,2*Math.random()-1, 6*Math.random()-3);
   return new Sphere(sphereSize,sphereMaterialColor,spherePosition,sphereVelocity);
 }
 
