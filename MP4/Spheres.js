@@ -59,14 +59,25 @@ class Sphere {
     if(this.velocity[1] < 0 && -this.velocity[1] < Math.abs(GRAVITY*time) && this.position[1] <= -10.0) {
       return; 
     } 
-    if(this.position[1] <= -10.0) { 
+    if(this.position[1] <= -10.0 || this.position[1] >= 10) { 
       this.velocity[1] = -this.velocity[1];
     }
+    if(this.position[0] <= -20.0 || this.position[0] >= 20) { 
+      this.velocity[0] = -this.velocity[0];
+    }
+    if(this.position[2] <= -1 || this.position[2] >= 1) { 
+      this.velocity[2] = -this.velocity[2];
+    }
 
-    // Update the velocity using the set of forces you are implementing (e.g. gravity and friction) 
-    this.velocity[1] = this.velocity[1]*Math.pow(GRAG, time) + GRAVITY*time;  
+    this.velocity[0] = this.velocity[0]*Math.pow(GRAG, time);
+    this.velocity[2] = this.velocity[2]*Math.pow(GRAG, time);
+    this.velocity[1] = this.velocity[1]*Math.pow(GRAG, time) + GRAVITY*time; 
     // Update the position using the current velocity and Euler Integration
-    this.position[1] = this.position[1] + this.velocity[1]*time;
+    var positionOff = vec3.create();
+    vec3.scale(positionOff, this.velocity, time);
+
+    vec3.add(this.position, this.position, positionOff);
+    // this.position[1] = this.position[1] + this.velocity[1]*time;
   }
 }
 
@@ -79,8 +90,8 @@ function generateSphere() {
   var sphereScale = Math.random()*2;
   sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
   sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
-  spherePosition = vec3.fromValues(generateRandomNumber(),generateRandomNumber()+10,Math.random());
-  sphereVelocity = vec3.fromValues(0,-Math.random(), 0);
+  spherePosition = vec3.fromValues(2*generateRandomNumber(),generateRandomNumber(),Math.random());
+  sphereVelocity = vec3.fromValues(5*Math.random()-2.5,2*Math.random()-1, 5*Math.random()-2.5);
   return new Sphere(sphereSize,sphereMaterialColor,spherePosition,sphereVelocity);
 }
 
@@ -108,7 +119,7 @@ function resetSphereArray() {
  */
 function generateRandomNumber() {
   var randomSign = Math.random() < 0.5 ? -1 : 1;
-  var randomNumber = Math.random()*20;
+  var randomNumber = Math.random()*10;
   var off = randomNumber*randomSign;
   return off;
 }
