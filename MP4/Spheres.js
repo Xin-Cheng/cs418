@@ -1,3 +1,7 @@
+/**
+ * @author Xin Cheng <xcheng11@illinois.edu>
+ * Code adapted from https://courses.engr.illinois.edu/cs418/fa2017/
+ */
 
 var gl;
 var canvas;
@@ -69,7 +73,7 @@ class Sphere {
       this.velocity[0] = -this.velocity[0];
     }
 
-    if(Math.abs(this.position[2]) >= 1) { 
+    if(Math.abs(this.position[2]) >= 10) { 
       this.velocity[2] = -this.velocity[2];
     }
 
@@ -93,7 +97,7 @@ function generateSphere() {
   var sphereScale = Math.random()*2;
   sphereSize = vec3.fromValues(sphereScale,sphereScale,sphereScale);
   sphereMaterialColor = vec3.fromValues(Math.random(),Math.random(),Math.random());
-  spherePosition = vec3.fromValues(1.2*generateRandomNumber(),2*generateRandomNumber()+10,Math.random());
+  spherePosition = vec3.fromValues(1.2*generateRandomNumber(),2*generateRandomNumber()+10,generateRandomNumber());
   sphereVelocity = vec3.fromValues(6*Math.random()-3,2*Math.random()-1, 10*Math.random()-5);
   return new Sphere(sphereSize,sphereMaterialColor,spherePosition,sphereVelocity);
 }
